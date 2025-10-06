@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔药酒馆 - 游戏演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #2D1B69, #1A1A2E);
+            color: #FFF8DC;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            background: rgba(45, 27, 105, 0.8);
+            border-radius: 20px;
+            border: 2px solid #FFD700;
+        }
+
+        .title {
+            font-size: 48px;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #FFF8DC;
+            opacity: 0.9;
+        }
+
+        .game-embed {
+            width: 100%;
+            height: 600px;
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(45, 27, 105, 0.9);
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 24px;
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+
+        .feature-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #FFF8DC;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: rgba(45, 27, 105, 0.8);
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .controls h3 {
+            color: #FFD700;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .control-key {
+            background: #FFD700;
+            color: #2D1B69;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .play-button {
+            display: block;
+            width: 300px;
+            margin: 30px auto;
+            padding: 20px 40px;
+            background: linear-gradient(45deg, #FFD700, #FFA502);
+            color: #2D1B69;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .play-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #FFD700;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 50px;
+            color: #FF4757;
+            font-size: 18px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .loading-message {
+            animation: pulse 2s infinite;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🧪 魔药酒馆</h1>
+            <p class="subtitle">经营你的魔法酒馆，成为最强大的魔药大师</p>
+        </div>
+
+        <div class="game-embed">
+            <iframe src="index.html" width="100%" height="100%" frameborder="0" id="game-frame"></iframe>
+        </div>
+
+        <div class="controls">
+            <h3>🎮 游戏操作</h3>
+            <div class="control-item">
+                <span class="control-key">鼠标点击</span>
+                <span>选择选项、拖拽材料、出牌等</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">[1-4]</span>
+                <span>在事件场景中快速选择选项</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">[SPACE]</span>
+                <span>确认选择或开始制作</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">[ESC]</span>
+                <span>返回/跳过事件</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">[B]</span>
+                <span>快速打开制作界面</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">[F]</span>
+                <span>快速打开对战界面</span>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🏪</div>
+                <h3 class="feature-title">酒馆经营</h3>
+                <p class="feature-description">
+                    管理你的魔法酒馆，接待各种奇幻客人，赚取金币和声誉。
+                    根据客人需求提供合适的魔药和服务。
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧪</div>
+                <h3 class="feature-title">魔药制作</h3>
+                <p class="feature-description">
+                    通过拖拽材料到坩埚中制作神奇魔药。
+                    不同材料组合会产生不同效果，成功率受技能影响。
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3 class="feature-title">卡牌对战</h3>
+                <p class="feature-description">
+                    与其他魔药师进行策略性卡牌对战。
+                    使用材料卡和道具卡，还可以虚张声势或识破对手！
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3 class="feature-title">随机事件</h3>
+                <p class="feature-description">
+                    处理各种突发事件：贵族订单、神秘访客、魔法异常等。
+                    每个选择都会影响你的酒馆命运。
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3 class="feature-title">员工管理</h3>
+                <p class="feature-description">
+                    雇佣和管理酒馆员工，提高工作效率。
+                    不同员工有不同技能和特长。
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3 class="feature-title">配方收集</h3>
+                <p class="feature-description">
+                    解锁和掌握各种魔药配方。
+                    通过实验、事件或对战获得新的制作知识。
+                </p>
+            </div>
+        </div>
+
+        <a href="index.html" class="play-button" target="_blank">🎮 开始游戏</a>
+
+        <div class="footer">
+            <p>🧪 基于 Phaser.js 3.70 开发的2D魔法酒馆经营游戏</p>
+            <p>✨ 融合经营模拟、魔药制作、卡牌对战等多种玩法</p>
+        </div>
+    </div>
+
+    <script>
+        // 游戏框架加载检测
+        const gameFrame = document.getElementById('game-frame');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading-message';
+        loadingDiv.innerHTML = '🔄 正在加载游戏框架...<br>如果长时间未加载，请直接访问 <a href="index.html" style="color: #FFD700;">游戏页面</a>';
+
+        gameFrame.parentNode.insertBefore(loadingDiv, gameFrame);
+
+        gameFrame.onload = function() {
+            loadingDiv.style.display = 'none';
+        };
+
+        gameFrame.onerror = function() {
+            loadingDiv.innerHTML = '❌ 游戏加载失败<br>请直接访问 <a href="index.html" style="color: #FFD700;">游戏页面</a>';
+            loadingDiv.className = 'error-message';
+        };
+
+        // 添加一些交互效果
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 页面标题动画
+        const title = document.querySelector('.title');
+        title.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+            this.style.textShadow = '4px 4px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5)';
+        });
+
+        title.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.textShadow = '3px 3px 6px rgba(0, 0, 0, 0.7)';
+        });
+    </script>
+</body>
+</html>

@@ -3,337 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>魔药酒馆 - 经营你的魔法酒馆，成为最强大的魔药大师</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <title>魔药酒馆 - 2D经营对战游戏</title>
     <style>
-        :root {
-            --primary-purple: #2D1B69;
-            --gold: #FFD700;
-            --emerald: #00FF7F;
-            --dark-blue: #1A1A2E;
-            --ivory: #FFF8DC;
-        }
-        
         body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1A1A2E 0%, #2D1B69 100%);
             font-family: 'Noto Sans SC', sans-serif;
-            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-purple) 100%);
-            color: var(--ivory);
-            overflow-x: hidden;
+            overflow: hidden;
         }
-        
-        .hero-title {
-            font-family: 'ZCOOL KuaiLe', cursive;
-            background: linear-gradient(45deg, var(--gold), var(--emerald));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        
-        .magic-card {
-            background: rgba(45, 27, 105, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            transition: all 0.3s ease;
+
+        #phaser-game {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
-        
-        .magic-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
-            border-color: var(--gold);
-        }
-        
-        .glow-button {
-            background: linear-gradient(45deg, var(--primary-purple), var(--emerald));
-            box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
-            transition: all 0.3s ease;
-        }
-        
-        .glow-button:hover {
-            box-shadow: 0 0 30px rgba(0, 255, 127, 0.8);
-            transform: scale(1.05);
-        }
-        
-        .particle-container {
+
+        .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .content-section {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, var(--gold), var(--emerald));
-            border-radius: 50%;
+            background: linear-gradient(135deg, #1A1A2E 0%, #2D1B69 100%);
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
+            align-items: center;
+            z-index: 1000;
         }
-        
-        .nav-link {
-            position: relative;
-            transition: all 0.3s ease;
+
+        .loading-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 48px;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            margin-bottom: 30px;
         }
-        
-        .nav-link:hover {
-            color: var(--gold);
+
+        .loading-bar {
+            width: 400px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
         }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gold);
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #00FF7F);
+            width: 0%;
             transition: width 0.3s ease;
         }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
-        .hero-bg {
-            background-image: url('./resources/hero-tavern.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-        
-        .section-divider {
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            margin: 4rem 0;
+
+        .loading-text {
+            color: #FFF8DC;
+            margin-top: 20px;
+            font-size: 18px;
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- 粒子效果容器 -->
-    <div id="particles" class="particle-container"></div>
-    
-    <!-- 导航栏 -->
-    <nav class="fixed top-0 w-full bg-black bg-opacity-50 backdrop-blur-md z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <h1 class="text-2xl font-bold hero-title">魔药酒馆</h1>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#home" class="nav-link text-lg font-medium">首页</a>
-                        <a href="gameplay.html" class="nav-link text-lg font-medium">玩法介绍</a>
-                        <a href="potions.html" class="nav-link text-lg font-medium">魔药图鉴</a>
-                        <a href="#about" class="nav-link text-lg font-medium">关于游戏</a>
-                    </div>
-                </div>
+    <div id="game-container">
+        <div class="loading-screen" id="loading-screen">
+            <h1 class="loading-title">魔药酒馆</h1>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
             </div>
+            <div class="loading-text" id="loading-text">正在加载魔法世界...</div>
         </div>
-    </nav>
-    
-    <!-- 英雄区域 -->
-    <section id="home" class="hero-bg min-h-screen flex items-center justify-center relative">
-        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div class="content-section text-center z-10 px-4">
-            <h1 class="hero-title text-6xl md:text-8xl font-bold mb-6 opacity-0" id="main-title">
-                魔药酒馆
-            </h1>
-            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-0" id="subtitle">
-                经营你的魔法酒馆，成为最强大的魔药大师
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center opacity-0" id="hero-buttons">
-                <a href="game.html" class="glow-button px-8 py-4 rounded-full text-lg font-semibold text-white text-center">
-                    🎮 开始游戏
-                </a>
-                <button class="border-2 border-gold text-gold px-8 py-4 rounded-full text-lg font-semibold hover:bg-gold hover:text-dark-blue transition-all duration-300">
-                    了解更多
-                </button>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 游戏特色 -->
-    <section class="py-20 content-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 hero-title">游戏特色</h2>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    体验独特的经营与对战双重玩法，在神秘的魔法世界中开启你的酒馆传奇
-                </p>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- 经营系统 -->
-                <div class="magic-card rounded-2xl p-8 text-center">
-                    <div class="feature-icon">🏪</div>
-                    <h3 class="text-2xl font-bold mb-4 text-gold">经营系统</h3>
-                    <p class="text-gray-300 mb-6">
-                        管理你的魔法酒馆，采购材料、制作魔药、招募员工，体验完整的经营循环。
-                        通过精心经营解锁更多配方和稀有材料。
-                    </p>
-                    <ul class="text-sm text-gray-400 space-y-2">
-                        <li>• 材料采购与管理</li>
-                        <li>• 员工招募与培养</li>
-                        <li>• 魔药制作与销售</li>
-                        <li>• 酒馆升级与扩展</li>
-                    </ul>
-                </div>
-                
-                <!-- 对战系统 -->
-                <div class="magic-card rounded-2xl p-8 text-center">
-                    <div class="feature-icon">⚔️</div>
-                    <h3 class="text-2xl font-bold mb-4 text-gold">对战系统</h3>
-                    <p class="text-gray-300 mb-6">
-                        与其他玩家进行策略性魔药对战，随机材料抽取，即时合成魔药，
-                        在6回合的战斗中展现你的智慧和技巧。
-                    </p>
-                    <ul class="text-sm text-gray-400 space-y-2">
-                        <li>• 随机材料抽取</li>
-                        <li>• 即时魔药合成</li>
-                        <li>• 策略性战斗选择</li>
-                        <li>• 段位晋升系统</li>
-                    </ul>
-                </div>
-                
-                <!-- 魔药系统 -->
-                <div class="magic-card rounded-2xl p-8 text-center">
-                    <div class="feature-icon">🧪</div>
-                    <h3 class="text-2xl font-bold mb-4 text-gold">魔药系统</h3>
-                    <p class="text-gray-300 mb-6">
-                        收集和制作各种神奇的魔药，每种魔药都有独特的效果和用途。
-                        从基础治疗药到强大的湮灭药剂，应有尽有。
-                    </p>
-                    <ul class="text-sm text-gray-400 space-y-2">
-                        <li>• 攻击类魔药</li>
-                        <li>• 控制类魔药</li>
-                        <li>• 辅助类魔药</li>
-                        <li>• 稀有传奇魔药</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <div class="section-divider"></div>
-    
-    <!-- 游戏循环展示 -->
-    <section class="py-20 content-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 hero-title">游戏循环</h2>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    经营为对战赋能，对战反哺经营收益，形成完美的游戏闭环
-                </p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gold rounded-full flex items-center justify-center text-2xl">1</div>
-                        <div>
-                            <h3 class="text-xl font-bold text-gold">经营酒馆</h3>
-                            <p class="text-gray-300">采购材料，制作魔药，招募员工，提升酒馆等级</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-emerald rounded-full flex items-center justify-center text-2xl">2</div>
-                        <div>
-                            <h3 class="text-xl font-bold text-emerald">解锁配方</h3>
-                            <p class="text-gray-300">通过经营解锁新的魔药配方和稀有材料</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-2xl">3</div>
-                        <div>
-                            <h3 class="text-xl font-bold text-purple-400">参与对战</h3>
-                            <p class="text-gray-300">使用解锁的魔药参与策略性对战</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-2xl">4</div>
-                        <div>
-                            <h3 class="text-xl font-bold text-red-400">获得奖励</h3>
-                            <p class="text-gray-300">胜利获得金币、材料和经验，强化经营能力</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="relative">
-                    <img src="./resources/battle-scene.jpg" alt="游戏对战场景" class="rounded-2xl shadow-2xl">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent rounded-2xl"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <div class="section-divider"></div>
-    
-    <!-- 新手引导 -->
-    <section class="py-20 content-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 hero-title">新手引导</h2>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    10分钟内掌握游戏核心玩法，轻松上手魔药酒馆
-                </p>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="magic-card rounded-2xl p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-gold to-emerald rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">📚</div>
-                    <h3 class="text-xl font-bold mb-3 text-gold">阶段一：经营基础</h3>
-                    <p class="text-gray-300 text-sm">
-                        学习材料采购、魔药制作和上架销售的基础操作，
-                        完成第一个经营循环，获得200金币奖励。
-                    </p>
-                </div>
-                
-                <div class="magic-card rounded-2xl p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔓</div>
-                    <h3 class="text-xl font-bold mb-3 text-emerald">阶段二：配方解锁</h3>
-                    <p class="text-gray-300 text-sm">
-                        通过销售魔药解锁第一个控制类魔药配方，
-                        了解配方解锁机制和魔药分类系统。
-                    </p>
-                </div>
-                
-                <div class="magic-card rounded-2xl p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-gold rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">⚔️</div>
-                    <h3 class="text-xl font-bold mb-3 text-purple-400">阶段三：对战入门</h3>
-                    <p class="text-gray-300 text-sm">
-                        参与新手教学对战，学习材料抽取和魔药使用，
-                        获得第一名员工和对战段位。
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- 页脚 -->
-    <footer class="bg-black bg-opacity-50 py-12 content-section">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="hero-title text-2xl font-bold mb-4">魔药酒馆</div>
-            <p class="text-gray-400 mb-4">© 2024 魔药酒馆游戏开发团队. 保留所有权利.</p>
-            <p class="text-gray-500 text-sm">在神秘的魔法世界中开启你的酒馆传奇</p>
-        </div>
-    </footer>
-    
-    <script src="main.js"></script>
+        <div id="phaser-game"></div>
+    </div>
+
+    <!-- Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <!-- 游戏核心文件 -->
+    <script src="js/utils/GameConfig.js"></script>
+    <script src="js/utils/GameState.js"></script>
+    <script src="js/utils/SaveManager.js"></script>
+    <script src="js/utils/EventManager.js"></script>
+
+    <!-- 数据定义 -->
+    <script src="js/data/PotionRecipes.js"></script>
+    <script src="js/data/CardDefinitions.js"></script>
+    <script src="js/data/CustomerTypes.js"></script>
+    <script src="js/data/RandomEvents.js"></script>
+
+    <!-- 实体类 -->
+    <script src="js/entities/Customer.js"></script>
+    <script src="js/entities/Staff.js"></script>
+    <script src="js/entities/Potion.js"></script>
+    <script src="js/entities/Card.js"></script>
+
+    <!-- 场景文件 -->
+    <script src="js/scenes/BootScene.js"></script>
+    <script src="js/scenes/PreloadScene.js"></script>
+    <script src="js/scenes/MenuScene.js"></script>
+    <script src="js/scenes/TavernScene.js"></script>
+    <script src="js/scenes/BrewingScene.js"></script>
+    <script src="js/scenes/BattleScene.js"></script>
+    <script src="js/scenes/EventScene.js"></script>
+
+    <!-- UI组件 -->
+    <script src="js/ui/UIManager.js"></script>
+    <script src="js/ui/ResourceBar.js"></script>
+    <script src="js/ui/CustomerUI.js"></script>
+    <script src="js/ui/BattleUI.js"></script>
+
+    <!-- 游戏主文件 -->
+    <script src="js/main.js"></script>
+
+    <script>
+        // 加载进度更新
+        let loadingProgress = 0;
+        const loadingText = document.getElementById('loading-text');
+        const loadingProgressBar = document.getElementById('loading-progress');
+
+        const loadingSteps = [
+            '正在加载魔法世界...',
+            '正在召唤精灵工人...',
+            '正在准备坩埚和材料...',
+            '正在调制初始魔药...',
+            '正在迎接第一位客人...',
+            '魔药酒馆准备开业！'
+        ];
+
+        let currentStep = 0;
+        const loadingInterval = setInterval(() => {
+            loadingProgress += Math.random() * 15 + 5;
+            if (loadingProgress >= 100) {
+                loadingProgress = 100;
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                }, 500);
+            }
+
+            loadingProgressBar.style.width = loadingProgress + '%';
+
+            // 更新文字
+            const newStep = Math.floor(loadingProgress / (100 / loadingSteps.length));
+            if (newStep > currentStep && newStep < loadingSteps.length) {
+                currentStep = newStep;
+                loadingText.textContent = loadingSteps[currentStep];
+            }
+        }, 200);
+    </script>
 </body>
 </html>
