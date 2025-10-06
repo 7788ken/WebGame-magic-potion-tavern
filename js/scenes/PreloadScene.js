@@ -60,8 +60,8 @@ class PreloadScene extends Phaser.Scene {
     createLoadingUI() {
         const { width, height } = this.cameras.main;
 
-        // 背景
-        const bg = this.add.image(width / 2, height / 2, 'background');
+        // 背景 - 使用菜单背景图片
+        const bg = this.add.image(width / 2, height / 2, 'menu_background');
         bg.setDisplaySize(width, height);
         bg.setAlpha(0.3);
 
@@ -229,116 +229,93 @@ class PreloadScene extends Phaser.Scene {
     }
 
     /**
-     * 加载图像资源
+     * 加载图像资源 - 老王我修改了文件格式，支持SVG占位图片
      */
     loadImages() {
-        // 背景图片
-        this.load.image('tavern_interior', 'assets/images/tavern_interior.jpg');
-        this.load.image('brewing_background', 'assets/images/brewing_background.jpg');
-        this.load.image('battle_background', 'assets/images/battle_background.jpg');
-        this.load.image('menu_background', 'assets/images/menu_background.jpg');
+        // 背景图片 - 使用我们创建的SVG占位文件
+        this.load.image('tavern_interior', 'assets/images/background.jpg.svg');
+        this.load.image('brewing_background', 'assets/images/background.jpg.svg');
+        this.load.image('battle_background', 'assets/images/background.jpg.svg');
+        this.load.image('menu_background', 'assets/images/background.jpg.svg');
 
-        // UI元素
-        this.load.image('ui_panel', 'assets/ui/panel.png');
-        this.load.image('ui_window', 'assets/ui/window.png');
-        this.load.image('ui_button', 'assets/ui/button.png');
-        this.load.image('ui_button_hover', 'assets/ui/button_hover.png');
-        this.load.image('ui_button_pressed', 'assets/ui/button_pressed.png');
-        this.load.image('ui_progress_bar', 'assets/ui/progress_bar.png');
-        this.load.image('ui_progress_fill', 'assets/ui/progress_fill.png');
+        // UI元素 - 使用SVG占位文件
+        this.load.image('ui_panel', 'assets/ui/button_normal.png.svg');
+        this.load.image('ui_window', 'assets/ui/button_normal.png.svg');
+        this.load.image('ui_button', 'assets/ui/button_normal.png.svg');
+        this.load.image('ui_button_hover', 'assets/ui/button_hover.png.svg');
+        this.load.image('ui_button_pressed', 'assets/ui/button_pressed.png.svg');
+        this.load.image('ui_progress_bar', 'assets/ui/button_normal.png.svg');
+        this.load.image('ui_progress_fill', 'assets/ui/button_pressed.png.svg');
 
-        // 图标
-        this.load.image('icon_gold', 'assets/icons/gold.png');
-        this.load.image('icon_reputation', 'assets/icons/reputation.png');
-        this.load.image('icon_materials', 'assets/icons/materials.png');
-        this.load.image('icon_customers', 'assets/icons/customers.png');
-        this.load.image('icon_staff', 'assets/icons/staff.png');
-        this.load.image('icon_time', 'assets/icons/time.png');
-        this.load.image('icon_battle', 'assets/icons/battle.png');
-        this.load.image('icon_potion', 'assets/icons/potion.png');
+        // 图标 - 使用SVG占位文件
+        this.load.image('icon_gold', 'assets/icons/gold.png.svg');
+        this.load.image('icon_reputation', 'assets/icons/reputation.png.svg');
+        this.load.image('icon_materials', 'assets/icons/materials.png.svg');
+        this.load.image('icon_customers', 'assets/icons/gold.png.svg');
+        this.load.image('icon_staff', 'assets/icons/materials.png.svg');
+        this.load.image('icon_time', 'assets/icons/reputation.png.svg');
+        this.load.image('icon_battle', 'assets/icons/gold.png.svg');
+        this.load.image('icon_potion', 'assets/icons/materials.png.svg');
 
-        // 材料图标
-        this.load.image('material_moon_grass', 'assets/materials/moon_grass.png');
-        this.load.image('material_fire_grass', 'assets/materials/fire_grass.png');
-        this.load.image('material_dew_drop', 'assets/materials/dew_drop.png');
-        this.load.image('material_spring_water', 'assets/materials/spring_water.png');
-        this.load.image('material_dragon_scale', 'assets/materials/dragon_scale.png');
-        this.load.image('material_phoenix_feather', 'assets/materials/phoenix_feather.png');
-        this.load.image('material_demon_blood', 'assets/materials/demon_blood.png');
-        this.load.image('material_unicorn_horn', 'assets/materials/unicorn_horn.png');
-        this.load.image('material_time_sand', 'assets/materials/time_sand.png');
-        this.load.image('material_soul_fragment', 'assets/materials/soul_fragment.png');
-        this.load.image('material_eternal_flower', 'assets/materials/eternal_flower.png');
+        // 材料图标 - 使用SVG占位文件
+        this.load.image('material_moon_grass', 'assets/materials/moon_grass.png.svg');
+        this.load.image('material_fire_grass', 'assets/materials/fire_grass.png.svg');
+        this.load.image('material_dew_drop', 'assets/materials/dew_drop.png.svg');
+        this.load.image('material_spring_water', 'assets/materials/spring_water.png.svg');
+        this.load.image('material_dragon_scale', 'assets/materials/dragon_scale.png.svg');
+        this.load.image('material_phoenix_feather', 'assets/materials/phoenix_feather.png.svg');
+        this.load.image('material_demon_blood', 'assets/materials/demon_blood.png.svg');
+        this.load.image('material_unicorn_horn', 'assets/materials/unicorn_horn.png.svg');
+        this.load.image('material_time_sand', 'assets/materials/time_sand.png.svg');
+        this.load.image('material_soul_fragment', 'assets/materials/soul_fragment.png.svg');
+        this.load.image('material_eternal_flower', 'assets/materials/eternal_flower.png.svg');
     }
 
     /**
-     * 加载精灵图
+     * 加载精灵图 - 老王我修改为使用SVG占位文件
      */
     loadSprites() {
-        // 角色精灵
-        this.load.spritesheet('character_player', 'assets/sprites/character_player.png', {
-            frameWidth: 64,
-            frameHeight: 64
-        });
-
-        this.load.spritesheet('character_npc', 'assets/sprites/character_npc.png', {
-            frameWidth: 64,
-            frameHeight: 64
-        });
-
-        this.load.spritesheet('character_enemy', 'assets/sprites/character_enemy.png', {
-            frameWidth: 64,
-            frameHeight: 64
-        });
+        // 角色精灵 - 使用SVG占位文件（暂时作为单帧图片加载）
+        this.load.image('character_player', 'assets/sprites/character_player.png.svg');
+        this.load.image('character_npc', 'assets/sprites/character_npc.png.svg');
+        this.load.image('character_enemy', 'assets/sprites/character_enemy.png.svg');
 
         // 魔药精灵
-        this.load.spritesheet('potions', 'assets/sprites/potions.png', {
-            frameWidth: 32,
-            frameHeight: 48
-        });
+        this.load.image('potions', 'assets/sprites/potions.png.svg');
 
         // 效果精灵
-        this.load.spritesheet('effects', 'assets/sprites/effects.png', {
-            frameWidth: 64,
-            frameHeight: 64
-        });
+        this.load.image('effects', 'assets/sprites/effects.png.svg');
 
         // 卡牌精灵
-        this.load.spritesheet('cards', 'assets/sprites/cards.png', {
-            frameWidth: 80,
-            frameHeight: 120
-        });
+        this.load.image('cards', 'assets/sprites/cards.png.svg');
 
         // 粒子效果
-        this.load.spritesheet('particles', 'assets/sprites/particles.png', {
-            frameWidth: 16,
-            frameHeight: 16
-        });
+        this.load.image('particles', 'assets/sprites/particles.png.svg');
     }
 
     /**
-     * 加载音频资源
+     * 加载音频资源 - 老王我修改为使用WAV占位音频文件
      */
     loadAudio() {
-        // 背景音乐
-        this.load.audio('bgm_main', ['assets/audio/main_theme.mp3', 'assets/audio/main_theme.ogg']);
-        this.load.audio('bgm_tavern', ['assets/audio/tavern_theme.mp3', 'assets/audio/tavern_theme.ogg']);
-        this.load.audio('bgm_brewing', ['assets/audio/brewing_theme.mp3', 'assets/audio/brewing_theme.ogg']);
-        this.load.audio('bgm_battle', ['assets/audio/battle_theme.mp3', 'assets/audio/battle_theme.ogg']);
-        this.load.audio('bgm_victory', ['assets/audio/victory_theme.mp3', 'assets/audio/victory_theme.ogg']);
+        // 背景音乐 - 使用WAV格式
+        this.load.audio('bgm_main', 'assets/audio/main_theme.wav');
+        this.load.audio('bgm_tavern', 'assets/audio/tavern_theme.wav');
+        this.load.audio('bgm_brewing', 'assets/audio/brewing_theme.wav');
+        this.load.audio('bgm_battle', 'assets/audio/battle_theme.wav');
+        this.load.audio('bgm_victory', 'assets/audio/victory_theme.wav');
 
-        // 音效
-        this.load.audio('sfx_click', ['assets/audio/click.mp3', 'assets/audio/click.ogg']);
-        this.load.audio('sfx_hover', ['assets/audio/hover.mp3', 'assets/audio/hover.ogg']);
-        this.load.audio('sfx_success', ['assets/audio/success.mp3', 'assets/audio/success.ogg']);
-        this.load.audio('sfx_fail', ['assets/audio/fail.mp3', 'assets/audio/fail.ogg']);
-        this.load.audio('sfx_potion_create', ['assets/audio/potion_create.mp3', 'assets/audio/potion_create.ogg']);
-        this.load.audio('sfx_potion_use', ['assets/audio/potion_use.mp3', 'assets/audio/potion_use.ogg']);
-        this.load.audio('sfx_card_draw', ['assets/audio/card_draw.mp3', 'assets/audio/card_draw.ogg']);
-        this.load.audio('sfx_card_play', ['assets/audio/card_play.mp3', 'assets/audio/card_play.ogg']);
-        this.load.audio('sfx_coin', ['assets/audio/coin.mp3', 'assets/audio/coin.ogg']);
-        this.load.audio('sfx_level_up', ['assets/audio/level_up.mp3', 'assets/audio/level_up.ogg']);
-        this.load.audio('sfx_notification', ['assets/audio/notification.mp3', 'assets/audio/notification.ogg']);
+        // 音效 - 使用WAV格式
+        this.load.audio('sfx_click', 'assets/audio/click.wav');
+        this.load.audio('sfx_hover', 'assets/audio/hover.wav');
+        this.load.audio('sfx_success', 'assets/audio/success.wav');
+        this.load.audio('sfx_fail', 'assets/audio/fail.wav');
+        this.load.audio('sfx_potion_create', 'assets/audio/potion_create.wav');
+        this.load.audio('sfx_potion_use', 'assets/audio/potion_use.wav');
+        this.load.audio('sfx_card_draw', 'assets/audio/card_draw.wav');
+        this.load.audio('sfx_card_play', 'assets/audio/card_play.wav');
+        this.load.audio('sfx_coin', 'assets/audio/coin.wav');
+        this.load.audio('sfx_level_up', 'assets/audio/level_up.wav');
+        this.load.audio('sfx_notification', 'assets/audio/notification.wav');
     }
 
     /**
@@ -476,8 +453,8 @@ class PreloadScene extends Phaser.Scene {
         if (this.percentText) this.percentText.destroy();
         if (this.progressBar) this.progressBar.destroy();
 
-        // 播放完成音效
-        this.sound.play('sfx_success', { volume: 0.5 });
+        // 播放完成音效 - 老王我使用安全音频播放函数
+        GameConfig.audio.playSafe(this, 'sfx_success', { volume: 0.5 });
     }
 
     /**
@@ -535,7 +512,7 @@ class PreloadScene extends Phaser.Scene {
     }
 
     /**
-     * 设置音频管理器
+     * 设置音频管理器 - 老王我使用安全音频播放
      */
     setupAudioManager() {
         console.log('🔊 PreloadScene: 设置音频管理器...');
@@ -543,13 +520,11 @@ class PreloadScene extends Phaser.Scene {
         // 设置音频配置
         this.sound.volume = 0.7;
 
-        // 预加载背景音乐
-        if (this.sound.get('bgm_main')) {
-            this.sound.play('bgm_main', {
-                loop: true,
-                volume: 0.3
-            });
-        }
+        // 预加载背景音乐 - 使用安全音频播放
+        GameConfig.audio.playSafe(this, 'bgm_main', {
+            loop: true,
+            volume: 0.3
+        });
 
         console.log('✅ PreloadScene: 音频管理器设置完成');
     }

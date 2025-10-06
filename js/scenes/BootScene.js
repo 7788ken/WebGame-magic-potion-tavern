@@ -280,7 +280,7 @@ class BootScene extends Phaser.Scene {
         saveManager.cleanupOldSaves();
 
         // 初始化事件管理器
-        eventManager.initialize();
+        eventManager.initializeEvents();
 
         // 检查游戏状态
         this.checkGameState();

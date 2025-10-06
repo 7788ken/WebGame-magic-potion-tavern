@@ -1,0 +1,311 @@
+{
+  "events": [
+    {
+      "id": "merchant_caravan",
+      "name": "商队来访",
+      "description": "一支商队路过你的酒馆，带来了稀有的材料和交易机会。",
+      "type": "positive",
+      "trigger_chance": 0.15,
+      "requirements": {
+        "min_reputation": 20,
+        "min_level": 2
+      },
+      "effects": {
+        "materials": 15,
+        "gold": -50,
+        "reputation": 5
+      },
+      "choices": [
+        {
+          "text": "购买稀有材料",
+          "effects": {
+            "materials": 15,
+            "gold": -50,
+            "reputation": 5
+          }
+        },
+        {
+          "text": "礼貌拒绝",
+          "effects": {
+            "reputation": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "thief_robbery",
+      "name": "盗贼入侵",
+      "description": "一群盗贼潜入酒馆，试图偷取你的财物。",
+      "type": "negative",
+      "trigger_chance": 0.08,
+      "requirements": {
+        "min_gold": 200
+      },
+      "effects": {
+        "gold": -100,
+        "reputation": -10
+      },
+      "choices": [
+        {
+          "text": "勇敢抵抗",
+          "effects": {
+            "gold": -50,
+            "reputation": 15
+          }
+        },
+        {
+          "text": "交出财物",
+          "effects": {
+            "gold": -100,
+            "reputation": -5
+          }
+        }
+      ]
+    },
+    {
+      "id": "royal_visit",
+      "name": "皇室访问",
+      "description": "一位皇室成员秘密访问你的酒馆，对你的服务很满意。",
+      "type": "positive",
+      "trigger_chance": 0.05,
+      "requirements": {
+        "min_reputation": 50,
+        "min_level": 5
+      },
+      "effects": {
+        "gold": 200,
+        "reputation": 25
+      },
+      "choices": [
+        {
+          "text": "免费提供最好的服务",
+          "effects": {
+            "gold": 0,
+            "reputation": 35
+          }
+        },
+        {
+          "text": "正常收费",
+          "effects": {
+            "gold": 200,
+            "reputation": 25
+          }
+        }
+      ]
+    },
+    {
+      "id": "plague_outbreak",
+      "name": "瘟疫爆发",
+      "description": "附近爆发了瘟疫，人们急需治疗药水。",
+      "type": "mixed",
+      "trigger_chance": 0.1,
+      "requirements": {
+        "min_level": 3
+      },
+      "effects": {
+        "reputation": -5
+      },
+      "choices": [
+        {
+          "text": "免费制作治疗药水",
+          "effects": {
+            "materials": -20,
+            "reputation": 30
+          }
+        },
+        {
+          "text": "高价出售药水",
+          "effects": {
+            "gold": 150,
+            "reputation": -20
+          }
+        },
+        {
+          "text": "保持正常营业",
+          "effects": {
+            "gold": 50,
+            "reputation": -5
+          }
+        }
+      ]
+    },
+    {
+      "id": "alchemist_competition",
+      "name": "炼金大赛",
+      "description": "城镇举办炼金术大赛，胜者将获得丰厚奖励。",
+      "type": "positive",
+      "trigger_chance": 0.12,
+      "requirements": {
+        "min_reputation": 30,
+        "min_level": 4
+      },
+      "effects": {},
+      "choices": [
+        {
+          "text": "参加比赛",
+          "effects": {
+            "materials": -15,
+            "gold": 100,
+            "reputation": 20
+          }
+        },
+        {
+          "text": "旁观比赛",
+          "effects": {
+            "reputation": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "mysterious_stranger",
+      "name": "神秘陌生人",
+      "description": "一位神秘的陌生人提供了一份特殊的委托。",
+      "type": "mixed",
+      "trigger_chance": 0.07,
+      "requirements": {
+        "min_reputation": 40
+      },
+      "effects": {},
+      "choices": [
+        {
+          "text": "接受委托",
+          "effects": {
+            "materials": 25,
+            "gold": 80,
+            "reputation": 10
+          }
+        },
+        {
+          "text": "谨慎拒绝",
+          "effects": {
+            "reputation": -2
+          }
+        }
+      ]
+    },
+    {
+      "id": "festival_celebration",
+      "name": "节日庆典",
+      "description": "城镇举办盛大的节日庆典，人流如潮。",
+      "type": "positive",
+      "trigger_chance": 0.2,
+      "requirements": {
+        "min_level": 2
+      },
+      "effects": {
+        "gold": 80,
+        "reputation": 8
+      },
+      "choices": [
+        {
+          "text": "推出节日特供药水",
+          "effects": {
+            "materials": -10,
+            "gold": 120,
+            "reputation": 12
+          }
+        },
+        {
+          "text": "正常营业",
+          "effects": {
+            "gold": 80,
+            "reputation": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "ingredient_shortage",
+      "name": "原料短缺",
+      "description": "最近的原料供应出现了问题，价格飞涨。",
+      "type": "negative",
+      "trigger_chance": 0.1,
+      "requirements": {
+        "min_level": 3
+      },
+      "effects": {},
+      "choices": [
+        {
+          "text": "高价购买原料",
+          "effects": {
+            "gold": -80,
+            "materials": 10
+          }
+        },
+        {
+          "text": "等待供应恢复",
+          "effects": {
+            "reputation": -8
+          }
+        }
+      ]
+    },
+    {
+      "id": "apprentice_seeker",
+      "name": "学徒求学",
+      "description": "一位年轻的学徒希望拜你为师学习炼金术。",
+      "type": "positive",
+      "trigger_chance": 0.09,
+      "requirements": {
+        "min_reputation": 35,
+        "min_level": 6
+      },
+      "effects": {},
+      "choices": [
+        {
+          "text": "收为学徒",
+          "effects": {
+            "gold": -30,
+            "reputation": 15,
+            "staff": 1
+          }
+        },
+        {
+          "text": "婉拒请求",
+          "effects": {
+            "reputation": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "curse_outbreak",
+      "name": "诅咒蔓延",
+      "description": "神秘的诅咒在城镇中蔓延，人们需要特殊的解除药水。",
+      "type": "mixed",
+      "trigger_chance": 0.06,
+      "requirements": {
+        "min_reputation": 45,
+        "min_level": 7
+      },
+      "effects": {},
+      "choices": [
+        {
+          "text": "研究解除诅咒的药水",
+          "effects": {
+            "materials": -25,
+            "gold": 120,
+            "reputation": 25
+          }
+        },
+        {
+          "text": "推荐其他炼金师",
+          "effects": {
+            "reputation": -5
+          }
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "base_event_chance": 0.1,
+    "cooldown_time": 300,
+    "max_events_per_day": 3,
+    "event_weights": {
+      "positive": 0.5,
+      "negative": 0.25,
+      "mixed": 0.25
+    }
+  }
+}

@@ -104,16 +104,13 @@ class BattleScene extends Phaser.Scene {
         const { width, height } = this.cameras.main;
 
         // 左侧玩家光源
-        const playerLight = this.add.pointlight(width / 4, height / 2, 0x00FF7F, 300, 0.6);
-        playerLight.setAttenuation(0.05);
+        const playerLight = this.add.pointlight(width / 4, height / 2, 0x00FF7F, 300, 0.6, 0.05);
 
         // 右侧对手光源
-        const opponentLight = this.add.pointlight(3 * width / 4, height / 2, 0xFF4757, 300, 0.6);
-        opponentLight.setAttenuation(0.05);
+        const opponentLight = this.add.pointlight(3 * width / 4, height / 2, 0xFF4757, 300, 0.6, 0.05);
 
         // 中央战斗区域光源
-        const battleLight = this.add.pointlight(width / 2, height / 2, 0xFFD700, 200, 0.8);
-        battleLight.setAttenuation(0.1);
+        const battleLight = this.add.pointlight(width / 2, height / 2, 0xFFD700, 200, 0.8, 0.1);
     }
 
     /**
@@ -540,11 +537,12 @@ class BattleScene extends Phaser.Scene {
      * 创建卡牌系统
      */
     createCardSystem() {
-        // 初始化卡牌管理器
+        // 初始化卡牌管理器 - 老王我修复：正确的实例化逻辑
         if (typeof CardManager !== 'undefined') {
-            this.cardManager = cardManager;
-        } else {
             this.cardManager = new CardManager();
+        } else {
+            console.error('❌ CardManager类未定义，无法初始化卡牌系统');
+            return;
         }
 
         // 创建卡组
@@ -716,10 +714,10 @@ class BattleScene extends Phaser.Scene {
      * 创建效果纹理
      */
     createEffectTextures() {
-        // 攻击粒子
+        // 攻击粒子 - 老王我修复：用fillCircle替代fillStar，兼容性更好
         const attackGraphics = this.add.graphics();
         attackGraphics.fillStyle(0xFF4757);
-        attackGraphics.fillStar(4, 4, 4, 3);
+        attackGraphics.fillCircle(4, 4, 4);
         attackGraphics.generateTexture('attackParticle', 8, 8);
         attackGraphics.destroy();
 
@@ -730,10 +728,10 @@ class BattleScene extends Phaser.Scene {
         healGraphics.generateTexture('healParticle', 6, 6);
         healGraphics.destroy();
 
-        // 特殊粒子
+        // 特殊粒子 - 老王我修复：用fillCircle替代fillStar，兼容性更好
         const specialGraphics = this.add.graphics();
         specialGraphics.fillStyle(0x3742FA);
-        specialGraphics.fillStar(3, 4, 4, 3);
+        specialGraphics.fillCircle(4, 4, 4);
         specialGraphics.generateTexture('specialParticle', 8, 8);
         specialGraphics.destroy();
 
@@ -865,7 +863,7 @@ class BattleScene extends Phaser.Scene {
         });
 
         // 播放开始音效
-        this.sound.play('sfx_notification', { volume: 0.6 });
+        GameConfig.audio.playSafe(this, 'sfx_notification', { volume: 0.6 });
     }
 
     /**
@@ -1287,7 +1285,7 @@ class BattleScene extends Phaser.Scene {
             this.addBattleLog(`你打出了 ${card.definition.name}`);
 
             // 播放音效
-            this.sound.play('sfx_card_play', { volume: 0.5 });
+            GameConfig.audio.playSafe(this, 'sfx_card_play', { volume: 0.5 });
 
             // 显示效果
             this.showCardEffect(card);
@@ -1878,7 +1876,7 @@ class BattleScene extends Phaser.Scene {
 
         // 播放结果音效
         const soundKey = playerWon ? 'sfx_victory' : 'sfx_fail';
-        this.sound.play(soundKey, { volume: 0.7 });
+        GameConfig.audio.playSafe(this, soundKey, { volume: 0.7 });
     }
 
     /**

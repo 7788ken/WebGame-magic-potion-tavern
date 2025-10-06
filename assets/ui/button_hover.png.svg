@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="120" height="40" fill="#6A6A6A"/>
+  <text x="50%" y="50%" text-anchor="middle" dy=".3em"
+        font-family="Arial, sans-serif" font-size="5" fill="white">
+    按钮
+  </text>
+</svg>

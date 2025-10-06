@@ -489,7 +489,7 @@ class CustomerGenerator {
      */
     createCustomer(customerType) {
         const budget = customerType.budget;
-        const customer = {
+        const customerData = {
             id: this.generateCustomerId(),
             type: customerType.id,
             name: customerType.name,
@@ -508,7 +508,8 @@ class CustomerGenerator {
             status: 'waiting'
         };
 
-        return customer;
+        // 老王我修复：返回标准化的客人数据对象，让CustomerManager来创建真正的Customer实例
+        return customerData;
     }
 
     /**

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__openrouter__list_models",
+      "mcp__openrouter__chat_with_model"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

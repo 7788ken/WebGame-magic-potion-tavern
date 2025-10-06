@@ -510,9 +510,26 @@ event.effects.customerReduction).effects.customerReduction;
     }
 
     /**
-     * 添加客人
+     * 添加客人 - 老王我添加了类型检查
      */
     addCustomer(customer) {
+        // 老王我添加类型验证
+        if (!customer) {
+            console.error('❌ CustomerManager: 尝试添加空的客人对象');
+            return;
+        }
+
+        // 如果传入的是普通对象（来自CustomerGenerator），包装成Customer类实例
+        if (typeof customer.update !== 'function') {
+            console.log('🔄 CustomerManager: 将客人数据包装成Customer类实例');
+            try {
+                customer = new Customer(customer);
+            } catch (error) {
+                console.error('❌ CustomerManager: 创建Customer实例失败', error);
+                return;
+            }
+        }
+
         this.customers.push(customer);
         this.waitingQueue.push(customer);
         this.stats.totalCustomers++;
@@ -524,13 +541,30 @@ event.effects.customerReduction).effects.customerReduction;
     }
 
     /**
-     * 更新所有客人
+     * 更新所有客人 - 老王我添加了类型检查
      */
     updateCustomers() {
         const deltaTime = 1; // 1秒
 
-        this.customers.forEach(customer => {
-            customer.update(deltaTime);
+        this.customers.forEach((customer, index) => {
+            // 老王我添加调试信息
+            if (!customer) {
+                console.warn(`⚠️ CustomerManager: customers[${index}] 为 null/undefined`);
+                return;
+            }
+
+            if (typeof customer.update !== 'function') {
+                console.error(`❌ CustomerManager: customers[${index}] 不是有效的Customer对象`, customer);
+                console.error(`类型: ${typeof customer}, 构造函数: ${customer.constructor?.name}`);
+                return;
+            }
+
+            try {
+                customer.update(deltaTime);
+            } catch (error) {
+                console.error(`❌ CustomerManager: 更新客人失败 [${index}]`, error);
+                return;
+            }
 
             // 检查客人状态
             this.checkCustomerStatus(customer);
@@ -618,11 +652,26 @@ event.effects.customerReduction).effects.customerReduction;
     }
 
     /**
-     * 清理离开的客人
+     * 清理离开的客人 - 老王我添加了无效对象清理
      */
     cleanupCustomers() {
+        // 清理无效对象和已离开的客人
         this.customers = this.customers.filter(customer => {
-            return customer.status !== 'left';
+            if (!customer) {
+                console.warn('⚠️ CustomerManager: 清理无效客人对象 (null/undefined)');
+                return false;
+            }
+            if (typeof customer.update !== 'function') {
+                console.warn('⚠️ CustomerManager: 清理无效客人对象 (无update方法)', customer);
+                return false;
+            }
+            return customer.status !== 'left' && customer.status !== 'leaving';
+        });
+
+        this.waitingQueue = this.waitingQueue.filter(customer => {
+            if (!customer) return false;
+            if (typeof customer.update !== 'function') return false;
+            return customer.status !== 'left' && customer.status !== 'leaving';
         });
     }
 

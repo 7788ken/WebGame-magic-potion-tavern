@@ -1,0 +1,367 @@
+{
+  "achievements": [
+    {
+      "id": "first_potion",
+      "name": "初试身手",
+      "description": "成功制作出第一瓶药水",
+      "icon": "🧪",
+      "category": "crafting",
+      "requirements": {
+        "type": "craft_potion",
+        "count": 1
+      },
+      "rewards": {
+        "gold": 50,
+        "reputation": 5,
+        "experience": 10
+      }
+    },
+    {
+      "id": "master_crafter",
+      "name": "炼金大师",
+      "description": "制作100瓶药水",
+      "icon": "🏆",
+      "category": "crafting",
+      "requirements": {
+        "type": "craft_potion",
+        "count": 100
+      },
+      "rewards": {
+        "gold": 1000,
+        "reputation": 50,
+        "experience": 100
+      }
+    },
+    {
+      "id": "first_customer",
+      "name": "开门红",
+      "description": "成功服务第一位顾客",
+      "icon": "💰",
+      "category": "business",
+      "requirements": {
+        "type": "serve_customer",
+        "count": 1
+      },
+      "rewards": {
+        "gold": 30,
+        "reputation": 3,
+        "experience": 5
+      }
+    },
+    {
+      "id": "popular_tavern",
+      "name": "人气酒馆",
+      "description": "服务100位顾客",
+      "icon": "👥",
+      "category": "business",
+      "requirements": {
+        "type": "serve_customer",
+        "count": 100
+      },
+      "rewards": {
+        "gold": 500,
+        "reputation": 30,
+        "experience": 50
+      }
+    },
+    {
+      "id": "first_victory",
+      "name": "初战告捷",
+      "description": "在战斗中取得第一场胜利",
+      "icon": "⚔️",
+      "category": "battle",
+      "requirements": {
+        "type": "battle_victory",
+        "count": 1
+      },
+      "rewards": {
+        "gold": 100,
+        "reputation": 10,
+        "experience": 20
+      }
+    },
+    {
+      "id": "battle_master",
+      "name": "战斗大师",
+      "description": "在战斗中取得50场胜利",
+      "icon": "🛡️",
+      "category": "battle",
+      "requirements": {
+        "type": "battle_victory",
+        "count": 50
+      },
+      "rewards": {
+        "gold": 2000,
+        "reputation": 100,
+        "experience": 200
+      }
+    },
+    {
+      "id": "collector_common",
+      "name": "收藏家",
+      "description": "收集10种不同的药水配方",
+      "icon": "📚",
+      "category": "collection",
+      "requirements": {
+        "type": "collect_recipes",
+        "count": 10
+      },
+      "rewards": {
+        "gold": 300,
+        "reputation": 25,
+        "experience": 40
+      }
+    },
+    {
+      "id": "collector_rare",
+      "name": "稀世收藏家",
+      "description": "收集25种不同的药水配方",
+      "icon": "💎",
+      "category": "collection",
+      "requirements": {
+        "type": "collect_recipes",
+        "count": 25
+      },
+      "rewards": {
+        "gold": 1500,
+        "reputation": 75,
+        "experience": 150
+      }
+    },
+    {
+      "id": "rich_merchant",
+      "name": "富有商人",
+      "description": "累计获得1000金币",
+      "icon": "💰",
+      "category": "wealth",
+      "requirements": {
+        "type": "total_gold",
+        "count": 1000
+      },
+      "rewards": {
+        "gold": 100,
+        "reputation": 20,
+        "experience": 30
+      }
+    },
+    {
+      "id": "wealthy_tycoon",
+      "name": "财富巨头",
+      "description": "累计获得10000金币",
+      "icon": "🏦",
+      "category": "wealth",
+      "requirements": {
+        "type": "total_gold",
+        "count": 10000
+      },
+      "rewards": {
+        "gold": 1000,
+        "reputation": 100,
+        "experience": 150
+      }
+    },
+    {
+      "id": "famous_tavern",
+      "name": "知名酒馆",
+      "description": "声誉达到500点",
+      "icon": "⭐",
+      "category": "reputation",
+      "requirements": {
+        "type": "total_reputation",
+        "count": 500
+      },
+      "rewards": {
+        "gold": 800,
+        "reputation": 50,
+        "experience": 100
+      }
+    },
+    {
+      "id": "legendary_tavern",
+      "name": "传说酒馆",
+      "description": "声誉达到2000点",
+      "icon": "👑",
+      "category": "reputation",
+      "requirements": {
+        "type": "total_reputation",
+        "count": 2000
+      },
+      "rewards": {
+        "gold": 3000,
+        "reputation": 200,
+        "experience": 300
+      }
+    },
+    {
+      "id": "perfect_service",
+      "name": "完美服务",
+      "description": "连续成功服务10位顾客",
+      "icon": "✨",
+      "category": "business",
+      "requirements": {
+        "type": "perfect_service_streak",
+        "count": 10
+      },
+      "rewards": {
+        "gold": 200,
+        "reputation": 25,
+        "experience": 40
+      }
+    },
+    {
+      "id": "survivor",
+      "name": "幸存者",
+      "description": "在血量低于10%的情况下赢得战斗",
+      "icon": "💀",
+      "category": "battle",
+      "requirements": {
+        "type": "low_hp_victory",
+        "count": 1
+      },
+      "rewards": {
+        "gold": 300,
+        "reputation": 30,
+        "experience": 60
+      }
+    },
+    {
+      "id": "speed_crafter",
+      "name": "速度工匠",
+      "description": "在30秒内制作一瓶药水",
+      "icon": "⚡",
+      "category": "crafting",
+      "requirements": {
+        "type": "fast_craft",
+        "time": 30
+      },
+      "rewards": {
+        "gold": 150,
+        "reputation": 15,
+        "experience": 25
+      }
+    },
+    {
+      "id": "element_master",
+      "name": "元素大师",
+      "description": "制作所有元素类型的药水至少一次",
+      "icon": "🔥",
+      "category": "crafting",
+      "requirements": {
+        "type": "all_elements",
+        "elements": ["fire", "ice", "lightning", "earth", "wind"]
+      },
+      "rewards": {
+        "gold": 500,
+        "reputation": 40,
+        "experience": 80
+      }
+    },
+    {
+      "id": "social_butterfly",
+      "name": "社交达人",
+      "description": "与所有类型的顾客成功交易至少一次",
+      "icon": "🤝",
+      "category": "business",
+      "requirements": {
+        "type": "all_customer_types",
+        "count": 8
+      },
+      "rewards": {
+        "gold": 400,
+        "reputation": 35,
+        "experience": 70
+      }
+    },
+    {
+      "id": "unbeatable",
+      "name": "无敌战神",
+      "description": "连续赢得20场战斗",
+      "icon": "🏆",
+      "category": "battle",
+      "requirements": {
+        "type": "win_streak",
+        "count": 20
+      },
+      "rewards": {
+        "gold": 2500,
+        "reputation": 150,
+        "experience": 250
+      }
+    },
+    {
+      "id": "philanthropist",
+      "name": "慈善家",
+      "description": "免费赠送50瓶药水给需要的顾客",
+      "icon": "❤️",
+      "category": "social",
+      "requirements": {
+        "type": "free_potions",
+        "count": 50
+      },
+      "rewards": {
+        "gold": 1000,
+        "reputation": 200,
+        "experience": 180
+      }
+    }
+  ],
+  "categories": {
+    "crafting": {
+      "name": "制作成就",
+      "icon": "🧪",
+      "description": "与药水制作相关的成就"
+    },
+    "business": {
+      "name": "经营成就",
+      "icon": "💰",
+      "description": "与酒馆经营相关的成就"
+    },
+    "battle": {
+      "name": "战斗成就",
+      "icon": "⚔️",
+      "description": "与战斗系统相关的成就"
+    },
+    "collection": {
+      "name": "收集成就",
+      "icon": "📚",
+      "description": "与收集和探索相关的成就"
+    },
+    "wealth": {
+      "name": "财富成就",
+      "icon": "💎",
+      "description": "与财富积累相关的成就"
+    },
+    "reputation": {
+      "name": "声誉成就",
+      "icon": "⭐",
+      "description": "与声誉提升相关的成就"
+    },
+    "social": {
+      "name": "社交成就",
+      "icon": "🤝",
+      "description": "与社交互动相关的成就"
+    }
+  },
+  "rewards": {
+    "titles": {
+      "novice_alchemist": "新手炼金师",
+      "skilled_alchemist": "熟练炼金师",
+      "master_alchemist": "炼金大师",
+      "legendary_alchemist": "传说炼金师"
+    },
+    "special_items": {
+      "golden_cauldron": {
+        "name": "黄金坩埚",
+        "description": "提升药水制作成功率20%",
+        "effect": "success_rate_bonus",
+        "value": 0.2
+      },
+      "ancient_grimoire": {
+        "name": "远古魔法书",
+        "description": "解锁特殊药水配方",
+        "effect": "unlock_recipes",
+        "value": ["time_potion", "space_potion"]
+      }
+    }
+  }
+}

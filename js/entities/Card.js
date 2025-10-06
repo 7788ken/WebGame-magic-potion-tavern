@@ -1036,12 +1036,12 @@ class CardManager {
     updateStats() {
         // 计算最常使用的卡牌
         if (this.cardUsage.size > 0) {
-            const mostUsed = Array.from(this.cardUsage.entries()).reduce((max, current) =
+            const mostUsed = Array.from(this.cardUsage.entries()).reduce((max, current) =>
                 current[1].count > max[1].count ? current : max
             );
             this.stats.mostPlayedCard = mostUsed[0];
 
-            const leastUsed = Array.from(this.cardUsage.entries()).reduce((min, current) =
+            const leastUsed = Array.from(this.cardUsage.entries()).reduce((min, current) =>
                 current[1].count < min[1].count ? current : min
             );
             this.stats.leastPlayedCard = leastUsed[0];
@@ -1090,7 +1090,12 @@ class CardManager {
     }
 }
 
-// 导出类
+// 导出类 - 老王我修复：支持浏览器环境和Node.js环境
 if (typeof module !== 'undefined' && module.exports) {
+    // Node.js环境
     module.exports = { Card, CardManager };
+} else if (typeof window !== 'undefined') {
+    // 浏览器环境 - 导出到全局作用域
+    window.Card = Card;
+    window.CardManager = CardManager;
 }

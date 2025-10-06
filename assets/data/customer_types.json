@@ -1,0 +1,192 @@
+{
+  "customer_types": [
+    {
+      "id": "merchant",
+      "name": "商人",
+      "icon": "🧑‍💼",
+      "description": "精明的商人，总是寻找最好的交易",
+      "patience": 100,
+      "payment_multiplier": 1.2,
+      "reputation_reward": 8,
+      "common_needs": ["healing", "mana", "luck"],
+      "rarity": "common",
+      "dialogues": [
+        "我需要一些药水来补充库存。",
+        "价格合适的话，我可以大量采购。",
+        "时间就是金钱，朋友。"
+      ]
+    },
+    {
+      "id": "noble",
+      "name": "贵族",
+      "icon": "👑",
+      "description": "高傲的贵族，对品质要求很高",
+      "patience": 80,
+      "payment_multiplier": 2.0,
+      "reputation_reward": 15,
+      "common_needs": ["wisdom", "love", "luck"],
+      "rarity": "rare",
+      "dialogues": [
+        "我需要最好的药水，钱不是问题。",
+        "别让我等太久，我的时间很宝贵。",
+        "如果你的药水效果好，我会推荐给我的朋友们。"
+      ]
+    },
+    {
+      "id": "adventurer",
+      "name": "冒险者",
+      "icon": "🗡️",
+      "description": "勇敢的冒险者，经常需要战斗药水",
+      "patience": 60,
+      "payment_multiplier": 1.5,
+      "reputation_reward": 12,
+      "common_needs": ["healing", "strength", "speed"],
+      "rarity": "common",
+      "dialogues": [
+        "我需要能让我在战斗中生存的药水。",
+        "明天我要深入地下城探险。",
+        "有能增强力量的药水吗？"
+      ]
+    },
+    {
+      "id": "scholar",
+      "name": "学者",
+      "icon": "🧙‍♂️",
+      "description": "博学的学者，对魔法药水很感兴趣",
+      "patience": 120,
+      "payment_multiplier": 1.8,
+      "reputation_reward": 10,
+      "common_needs": ["wisdom", "mana", "wisdom"],
+      "rarity": "uncommon",
+      "dialogues": [
+        "我对魔法药水的配方很感兴趣。",
+        "知识就是力量，而力量需要药水来维持。",
+        "你的药水有什么特殊的魔法效果吗？"
+      ]
+    },
+    {
+      "id": "commoner",
+      "name": "平民",
+      "icon": "👨‍🌾",
+      "description": "普通的村民，需要基础的药水",
+      "patience": 150,
+      "payment_multiplier": 1.0,
+      "reputation_reward": 5,
+      "common_needs": ["healing", "sleep", "luck"],
+      "rarity": "common",
+      "dialogues": [
+        "我只是需要一些基本的药水。",
+        "价格不要太贵，我收入有限。",
+        "谢谢你的帮助，善良的炼金师。"
+      ]
+    },
+    {
+      "id": "knight",
+      "name": "骑士",
+      "icon": "⚔️",
+      "description": "忠诚的骑士，需要坚固的防护",
+      "patience": 90,
+      "payment_multiplier": 1.6,
+      "reputation_reward": 14,
+      "common_needs": ["strength", "healing", "strength"],
+      "rarity": "uncommon",
+      "dialogues": [
+        "我需要能够保护我的药水。",
+        "王国边境不太平，我需要最好的防护。",
+        "你的药水能让我在战斗中坚持更久吗？"
+      ]
+    },
+    {
+      "id": "thief",
+      "name": "盗贼",
+      "icon": "🥷",
+      "description": "神秘的盗贼，偏爱敏捷和隐秘",
+      "patience": 70,
+      "payment_multiplier": 1.3,
+      "reputation_reward": 9,
+      "common_needs": ["speed", "luck", "sleep"],
+      "rarity": "uncommon",
+      "dialogues": [
+        "我需要能让我行动更迅速的药水。",
+        "别问太多问题，我只需要结果。",
+        "如果你的药水有效，我会再来的。"
+      ]
+    },
+    {
+      "id": "priest",
+      "name": "牧师",
+      "icon": "⛪",
+      "description": "神圣的牧师，寻求纯净的治疗",
+      "patience": 110,
+      "payment_multiplier": 1.7,
+      "reputation_reward": 13,
+      "common_needs": ["healing", "wisdom", "love"],
+      "rarity": "uncommon",
+      "dialogues": [
+        "我需要纯净的治疗药水来帮助他人。",
+        "光明会指引我们找到正确的药水。",
+        "你的药水必须是纯净无害的。"
+      ]
+    },
+    {
+      "id": "bard",
+      "name": "吟游诗人",
+      "icon": "🎵",
+      "description": "浪漫的吟游诗人，追求灵感和爱情",
+      "patience": 100,
+      "payment_multiplier": 1.4,
+      "reputation_reward": 8,
+      "common_needs": ["love", "luck", "wisdom"],
+      "rarity": "rare",
+      "dialogues": [
+        "我需要能激发灵感的神奇药水。",
+        "爱情是世界上最美好的魔法。",
+        "你的药水能帮助我创作出更好的歌曲吗？"
+      ]
+    },
+    {
+      "id": "alchemist",
+      "name": "炼金术士",
+      "icon": "⚗️",
+      "description": "同行炼金术士，对稀有配方很感兴趣",
+      "patience": 130,
+      "payment_multiplier": 2.2,
+      "reputation_reward": 20,
+      "common_needs": ["wisdom", "wisdom", "wisdom"],
+      "rarity": "epic",
+      "dialogues": [
+        "我对你的炼金技术很感兴趣。",
+        "知识是炼金术的核心，而炼金术是知识的体现。",
+        "如果你的配方独特，我愿意出高价。"
+      ]
+    }
+  ],
+  "spawn_rates": {
+    "common": {
+      "weight": 70,
+      "min_level": 1
+    },
+    "uncommon": {
+      "weight": 20,
+      "min_level": 3
+    },
+    "rare": {
+      "weight": 8,
+      "min_level": 5
+    },
+    "epic": {
+      "weight": 2,
+      "min_level": 8
+    }
+  },
+  "behavior_settings": {
+    "base_patience_decay": 2,
+    "level_modifier": 0.5,
+    "reputation_modifier": 0.3,
+    "max_customers": 5,
+    "spawn_interval": {
+      "min": 10,
+      "max": 30
+    }
+  }
+}

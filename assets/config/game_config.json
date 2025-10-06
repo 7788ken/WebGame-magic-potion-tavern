@@ -1,0 +1,153 @@
+{
+  "game": {
+    "name": "魔药酒馆",
+    "version": "1.0.0",
+    "author": "老王炼金工坊",
+    "description": "一个融合经营模拟和对战系统的网页游戏"
+  },
+  "settings": {
+    "difficulty": {
+      "easy": {
+        "name": "简单",
+        "customer_patience_multiplier": 1.5,
+        "material_cost_multiplier": 0.8,
+        "battle_damage_multiplier": 0.8,
+        "starting_resources": {
+          "gold": 500,
+          "materials": 50,
+          "reputation": 20
+        }
+      },
+      "normal": {
+        "name": "普通",
+        "customer_patience_multiplier": 1.0,
+        "material_cost_multiplier": 1.0,
+        "battle_damage_multiplier": 1.0,
+        "starting_resources": {
+          "gold": 300,
+          "materials": 30,
+          "reputation": 10
+        }
+      },
+      "hard": {
+        "name": "困难",
+        "customer_patience_multiplier": 0.7,
+        "material_cost_multiplier": 1.3,
+        "battle_damage_multiplier": 1.2,
+        "starting_resources": {
+          "gold": 150,
+          "materials": 15,
+          "reputation": 5
+        }
+      }
+    },
+    "time": {
+      "day_duration": 300,
+      "customer_spawn_interval": {
+        "min": 15,
+        "max": 45
+      },
+      "material_regeneration_rate": 1,
+      "event_check_interval": 60
+    },
+    "economy": {
+      "base_material_cost": 5,
+      "base_potion_price": 50,
+      "reputation_price_multiplier": 0.05,
+      "customer_satisfaction_bonus": 0.2,
+      "daily_expenses": 20
+    },
+    "battle": {
+      "player_base_hp": 100,
+      "enemy_base_hp": 80,
+      "max_hand_size": 7,
+      "initial_cards": 5,
+      "cards_per_turn": 1,
+      "max_mana": 100,
+      "starting_mana": 30
+    },
+    "crafting": {
+      "base_success_rate": 0.9,
+      "difficulty_modifier": -0.1,
+      "material_quality_bonus": 0.05,
+      "tool_quality_bonus": 0.1,
+      "skill_level_bonus": 0.02
+    }
+  },
+  "ui": {
+    "colors": {
+      "primary": "#2D1B69",
+      "secondary": "#FFD700",
+      "accent": "#00FF7F",
+      "background": "#1A1A2E",
+      "text": "#FFF8DC",
+      "success": "#00FF00",
+      "warning": "#FFA500",
+      "error": "#FF0000"
+    },
+    "fonts": {
+      "title": "ZCOOL KuaiLe",
+      "body": "Noto Sans SC",
+      "serif": "Noto Serif SC"
+    },
+    "animations": {
+      "transition_duration": 300,
+      "hover_scale": 1.05,
+      "click_scale": 0.95,
+      "particle_density": 0.5
+    }
+  },
+  "audio": {
+    "volume": {
+      "master": 0.7,
+      "music": 0.5,
+      "sfx": 0.8,
+      "ambient": 0.3
+    },
+    "tracks": {
+      "main_theme": "bgm_main",
+      "tavern_ambient": "bgm_tavern",
+      "brewing_theme": "bgm_brewing",
+      "battle_theme": "bgm_battle",
+      "victory_theme": "bgm_victory"
+    }
+  },
+  "progression": {
+    "level_thresholds": [
+      0, 100, 250, 500, 1000, 2000, 3500, 5500, 8000, 12000,
+      17000, 23000, 30000, 38000, 47000, 57000, 68000, 80000, 93000, 107000
+    ],
+    "unlock_requirements": {
+      "advanced_potions": 5,
+      "battle_mode": 3,
+      "rare_materials": 8,
+      "staff_hiring": 10,
+      "tavern_expansion": 15
+    },
+    "rewards": {
+      "level_up": {
+        "gold": 100,
+        "materials": 10,
+        "reputation": 10
+      }
+    }
+  },
+  "features": {
+    "auto_save": {
+      "enabled": true,
+      "interval": 60
+    },
+    "tutorial": {
+      "enabled": true,
+      "skip_option": true
+    },
+    "achievements": {
+      "enabled": true,
+      "notifications": true
+    },
+    "statistics": {
+      "enabled": true,
+      "track_detailed": true
+    }
+  }
+}

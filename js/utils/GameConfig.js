@@ -210,6 +210,88 @@ const GameConfig = {
             background: 0x1A1A2E,
             text: 0xFFF8DC
         }
+    },
+
+    // 音频工具函数 - 老王我添加的错误保护
+    audio: {
+        /**
+         * 安全播放音频 - 带错误保护
+         * @param {Phaser.Scene} scene - 当前场景
+         * @param {string} soundKey - 音频键名
+         * @param {object} config - 播放配置
+         * @returns {boolean} 是否播放成功
+         */
+        playSafe: function(scene, soundKey, config = {}) {
+            try {
+                if (!scene || !scene.sound) {
+                    console.warn(`⚠️ 音频播放失败: 场景或音频系统不可用`);
+                    return false;
+                }
+
+                if (!soundKey) {
+                    console.warn(`⚠️ 音频播放失败: 音频键名为空`);
+                    return false;
+                }
+
+                // 检查音频是否存在
+                const sound = scene.sound.get(soundKey);
+                if (!sound) {
+                    console.warn(`⚠️ 音频播放失败: 音频键 '${soundKey}' 未找到`);
+                    return false;
+                }
+
+                // 设置默认配置
+                const defaultConfig = { volume: 0.5 };
+                const finalConfig = { ...defaultConfig, ...config };
+
+                // 播放音频
+                scene.sound.play(soundKey, finalConfig);
+                return true;
+
+            } catch (error) {
+                console.warn(`⚠️ 音频播放失败: ${error.message}`);
+                return false;
+            }
+        },
+
+        /**
+         * 检查音频是否存在
+         * @param {Phaser.Scene} scene - 当前场景
+         * @param {string} soundKey - 音频键名
+         * @returns {boolean} 音频是否存在
+         */
+        exists: function(scene, soundKey) {
+            try {
+                return scene && scene.sound && scene.sound.get(soundKey) !== null;
+            } catch (error) {
+                return false;
+            }
+        },
+
+        /**
+         * 批量播放音频检查
+         * @param {Phaser.Scene} scene - 当前场景
+         * @param {Array<string>} soundKeys - 音频键名数组
+         * @returns {object} 检查结果
+         */
+        checkMultiple: function(scene, soundKeys) {
+            const result = {
+                allExist: true,
+                missing: [],
+                existing: []
+            };
+
+            soundKeys.forEach(key => {
+                if (this.exists(scene, key)) {
+                    result.existing.push(key);
+                } else {
+                    result.missing.push(key);
+                    result.allExist = false;
+                }
+            });
+
+            return result;
+        }
     }
 };
 

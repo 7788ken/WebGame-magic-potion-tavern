@@ -1,0 +1,319 @@
+{
+  "cards": [
+    {
+      "id": "fireball",
+      "name": "火球术",
+      "type": "attack",
+      "icon": "🔥",
+      "description": "发射炽热的火球攻击敌人",
+      "damage": 15,
+      "mana_cost": 10,
+      "rarity": "common",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 15,
+          "element": "fire"
+        }
+      ]
+    },
+    {
+      "id": "ice_shard",
+      "name": "冰锥术",
+      "type": "attack",
+      "icon": "❄️",
+      "description": "召唤锋利的冰锥刺穿敌人",
+      "damage": 12,
+      "mana_cost": 8,
+      "rarity": "common",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 12,
+          "element": "ice"
+        }
+      ]
+    },
+    {
+      "id": "lightning_bolt",
+      "name": "闪电箭",
+      "type": "attack",
+      "icon": "⚡",
+      "description": "释放强大的闪电攻击",
+      "damage": 20,
+      "mana_cost": 15,
+      "rarity": "uncommon",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 20,
+          "element": "lightning"
+        }
+      ]
+    },
+    {
+      "id": "heal",
+      "name": "治疗术",
+      "type": "heal",
+      "icon": "💚",
+      "description": "恢复生命值的治疗魔法",
+      "heal": 25,
+      "mana_cost": 12,
+      "rarity": "common",
+      "effects": [
+        {
+          "type": "heal",
+          "value": 25
+        }
+      ]
+    },
+    {
+      "id": "greater_heal",
+      "name": "强效治疗",
+      "type": "heal",
+      "icon": "💖",
+      "description": "强力的治疗魔法，恢复大量生命值",
+      "heal": 50,
+      "mana_cost": 25,
+      "rarity": "uncommon",
+      "effects": [
+        {
+          "type": "heal",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "id": "shield",
+      "name": "护盾术",
+      "type": "defense",
+      "icon": "🛡️",
+      "description": "召唤魔法护盾抵挡伤害",
+      "defense": 20,
+      "mana_cost": 15,
+      "rarity": "common",
+      "effects": [
+        {
+          "type": "shield",
+          "value": 20,
+          "duration": 3
+        }
+      ]
+    },
+    {
+      "id": "barrier",
+      "name": "魔法屏障",
+      "type": "defense",
+      "icon": "✨",
+      "description": "创造强大的魔法防护屏障",
+      "defense": 35,
+      "mana_cost": 30,
+      "rarity": "rare",
+      "effects": [
+        {
+          "type": "shield",
+          "value": 35,
+          "duration": 5
+        }
+      ]
+    },
+    {
+      "id": "poison_dart",
+      "name": "毒镖",
+      "type": "attack",
+      "icon": "☠️",
+      "description": "发射带有剧毒的飞镖",
+      "damage": 8,
+      "mana_cost": 12,
+      "rarity": "uncommon",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 8
+        },
+        {
+          "type": "poison",
+          "value": 5,
+          "duration": 3
+        }
+      ]
+    },
+    {
+      "id": "fire_storm",
+      "name": "火焰风暴",
+      "type": "attack",
+      "icon": "🌋",
+      "description": "召唤毁灭性的火焰风暴",
+      "damage": 35,
+      "mana_cost": 40,
+      "rarity": "rare",
+      "effects": [
+        {
+          "type": "area_damage",
+          "value": 35,
+          "element": "fire"
+        }
+      ]
+    },
+    {
+      "id": "freeze",
+      "name": "冰冻术",
+      "type": "control",
+      "icon": "🧊",
+      "description": "冻结敌人，使其无法行动",
+      "damage": 10,
+      "mana_cost": 20,
+      "rarity": "uncommon",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 10,
+          "element": "ice"
+        },
+        {
+          "type": "freeze",
+          "duration": 2
+        }
+      ]
+    },
+    {
+      "id": "teleport",
+      "name": "传送术",
+      "type": "special",
+      "icon": "🌀",
+      "description": "瞬间传送到安全位置",
+      "mana_cost": 18,
+      "rarity": "rare",
+      "effects": [
+        {
+          "type": "evade",
+          "duration": 1
+        }
+      ]
+    },
+    {
+      "id": "mana_burn",
+      "name": "法力燃烧",
+      "type": "attack",
+      "icon": "🔮",
+      "description": "燃烧敌人的法力值并造成伤害",
+      "damage": 15,
+      "mana_cost": 22,
+      "rarity": "rare",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 15
+        },
+        {
+          "type": "mana_burn",
+          "value": 20
+        }
+      ]
+    },
+    {
+      "id": "regeneration",
+      "name": "再生术",
+      "type": "heal",
+      "icon": "🌱",
+      "description": "持续恢复生命值",
+      "heal": 15,
+      "mana_cost": 20,
+      "rarity": "uncommon",
+      "effects": [
+        {
+          "type": "regeneration",
+          "value": 15,
+          "duration": 4
+        }
+      ]
+    },
+    {
+      "id": "confusion",
+      "name": "混乱术",
+      "type": "control",
+      "icon": "😵",
+      "description": "使敌人陷入混乱状态",
+      "mana_cost": 16,
+      "rarity": "uncommon",
+      "effects": [
+        {
+          "type": "confuse",
+          "duration": 3
+        }
+      ]
+    },
+    {
+      "id": "vampiric_touch",
+      "name": "吸血鬼之触",
+      "type": "attack",
+      "icon": "🧛",
+      "description": "吸取敌人的生命力",
+      "damage": 18,
+      "mana_cost": 24,
+      "rarity": "rare",
+      "effects": [
+        {
+          "type": "life_drain",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "meteor",
+      "name": "流星术",
+      "type": "attack",
+      "icon": "☄️",
+      "description": "召唤毁灭性的流星",
+      "damage": 50,
+      "mana_cost": 50,
+      "rarity": "epic",
+      "effects": [
+        {
+          "type": "direct_damage",
+          "value": 50,
+          "element": "fire"
+        }
+      ]
+    }
+  ],
+  "rarities": {
+    "common": {
+      "name": "普通",
+      "color": "#FFFFFF",
+      "drop_rate": 0.6
+    },
+    "uncommon": {
+      "name": "稀有",
+      "color": "#00FF00",
+      "drop_rate": 0.25
+    },
+    "rare": {
+      "name": "史诗",
+      "color": "#9370DB",
+      "drop_rate": 0.12
+    },
+    "epic": {
+      "name": "传说",
+      "color": "#FFD700",
+      "drop_rate": 0.03
+    }
+  },
+  "elements": {
+    "fire": {
+      "name": "火焰",
+      "icon": "🔥",
+      "color": "#FF6347"
+    },
+    "ice": {
+      "name": "冰霜",
+      "icon": "❄️",
+      "color": "#87CEEB"
+    },
+    "lightning": {
+      "name": "闪电",
+      "icon": "⚡",
+      "color": "#FFD700"
+    }
+  }
+}

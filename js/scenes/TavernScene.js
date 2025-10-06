@@ -107,14 +107,13 @@ class TavernScene extends Phaser.Scene {
     }
 
     /**
-     * 创建魔法光源
+     * 创建魔法光源 - 老王我修复了PointLight API
      */
     createMagicalLighting() {
         const { width, height } = this.cameras.main;
 
-        // 中央吊灯
-        const chandelier = this.add.pointlight(width / 2, height / 3, 0xFFD700, 300, 0.8);
-        chandelier.setAttenuation(0.05);
+        // 中央吊灯 - attenuation作为第6个参数
+        const chandelier = this.add.pointlight(width / 2, height / 3, 0xFFD700, 300, 0.8, 0.05);
 
         // 壁灯
         const wallLights = [
@@ -125,13 +124,11 @@ class TavernScene extends Phaser.Scene {
         ];
 
         wallLights.forEach(light => {
-            const wallLight = this.add.pointlight(light.x, light.y, 0x00FF7F, 150, 0.6);
-            wallLight.setAttenuation(0.1);
+            const wallLight = this.add.pointlight(light.x, light.y, 0x00FF7F, 150, 0.6, 0.1);
         });
 
         // 坩埚光源
-        const cauldronLight = this.add.pointlight(width / 2, height - 150, 0xFF6348, 100, 0.7);
-        cauldronLight.setAttenuation(0.15);
+        const cauldronLight = this.add.pointlight(width / 2, height - 150, 0xFF6348, 100, 0.7, 0.15);
     }
 
     /**
@@ -343,7 +340,7 @@ class TavernScene extends Phaser.Scene {
         });
 
         button.on('pointerdown', () => {
-            this.sound.play('sfx_click', { volume: 0.5 });
+            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.5 });
             onClick();
         });
 
@@ -708,9 +705,8 @@ class TavernScene extends Phaser.Scene {
                 fontSize: '24px'
             }).setOrigin(0.5);
 
-            // 添加发光效果
-            const glow = this.add.pointlight(crystal.x, crystal.y, crystal.color, 50, 0.6);
-            glow.setAttenuation(0.1);
+            // 添加发光效果 - 老王我修复了PointLight API
+            const glow = this.add.pointlight(crystal.x, crystal.y, crystal.color, 50, 0.6, 0.1);
 
             // 添加闪烁动画
             this.tweens.add({
@@ -814,9 +810,8 @@ class TavernScene extends Phaser.Scene {
         // 制作按钮
         this.createBrewingButton(brewingX, brewingY + 80);
 
-        // 添加制作区域光效
-        const brewingLight = this.add.pointlight(brewingX, brewingY, 0xFF6348, 80, 0.7);
-        brewingLight.setAttenuation(0.1);
+        // 添加制作区域光效 - 老王我修复了PointLight API
+        const brewingLight = this.add.pointlight(brewingX, brewingY, 0xFF6348, 80, 0.7, 0.1);
 
         // 添加蒸汽效果
         this.createSteamEffect(brewingX, brewingY - 20);
@@ -845,7 +840,7 @@ class TavernScene extends Phaser.Scene {
             Phaser.Geom.Rectangle.Contains);
 
         button.on('pointerdown', () => {
-            this.sound.play('sfx_click', { volume: 0.5 });
+            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.5 });
             this.openBrewingInterface();
         });
 
@@ -987,7 +982,7 @@ class TavernScene extends Phaser.Scene {
         this.queueNotification('酒馆开始营业，祝你好运！', 'success');
 
         // 播放营业音效
-        this.sound.play('sfx_notification', { volume: 0.5 });
+        GameConfig.audio.playSafe(this, 'sfx_notification', { volume: 0.5 });
     }
 
     /**
@@ -1496,7 +1491,7 @@ class TavernScene extends Phaser.Scene {
         this.queueNotification('欢迎来到魔药酒馆！开始你的经营之旅吧！', 'success');
 
         // 播放欢迎音效
-        this.sound.play('sfx_notification', { volume: 0.5 });
+        GameConfig.audio.playSafe(this, 'sfx_notification', { volume: 0.5 });
     }
 
     /**

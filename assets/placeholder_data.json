@@ -1,0 +1,32 @@
+{
+  "images": {
+    "logo": "assets/images/logo.png.svg",
+    "background": "assets/images/background.jpg.svg",
+    "tavern_background": "assets/images/tavern_background.jpg.svg"
+  },
+  "ui": {
+    "button_normal": "assets/ui/button_normal.png.svg",
+    "button_hover": "assets/ui/button_hover.png.svg",
+    "button_pressed": "assets/ui/button_pressed.png.svg"
+  },
+  "icons": {
+    "gold": "assets/icons/gold.png.svg",
+    "materials": "assets/icons/materials.png.svg",
+    "reputation": "assets/icons/reputation.png.svg"
+  },
+  "materials": {
+    "moon_grass": "assets/materials/moon_grass.png.svg",
+    "fire_grass": "assets/materials/fire_grass.png.svg",
+    "dew_drop": "assets/materials/dew_drop.png.svg"
+  },
+  "particles": {
+    "spark": "assets/particles/spark.png.svg",
+    "glow": "assets/particles/glow.png.svg",
+    "magic": "assets/particles/magic.png.svg"
+  },
+  "sprites": {
+    "character_player": "assets/sprites/character_player.png.svg",
+    "character_npc": "assets/sprites/character_npc.png.svg",
+    "character_enemy": "assets/sprites/character_enemy.png.svg"
+  }
+}

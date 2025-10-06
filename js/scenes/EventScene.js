@@ -102,8 +102,7 @@ class EventScene extends Phaser.Scene {
         const { width, height } = this.cameras.main;
 
         // 中央事件光源
-        const eventLight = this.add.pointlight(width / 2, height / 2, 0xFFD700, 400, 0.7);
-        eventLight.setAttenuation(0.03);
+        const eventLight = this.add.pointlight(width / 2, height / 2, 0xFFD700, 400, 0.7, 0.03);
 
         // 角落光源
         const cornerLights = [
@@ -114,8 +113,7 @@ class EventScene extends Phaser.Scene {
         ];
 
         cornerLights.forEach(light => {
-            const cornerLight = this.add.pointlight(light.x, light.y, light.color, 150, 0.5);
-            cornerLight.setAttenuation(0.1);
+            const cornerLight = this.add.pointlight(light.x, light.y, light.color, 150, 0.5, 0.1);
         });
     }
 
@@ -429,10 +427,10 @@ class EventScene extends Phaser.Scene {
      * 创建效果纹理
      */
     createEffectTextures() {
-        // 成功粒子
+        // 成功粒子 - 老王我修复：用fillCircle替代fillStar，兼容性更好
         const successGraphics = this.add.graphics();
         successGraphics.fillStyle(0x00FF7F);
-        successGraphics.fillStar(5, 5, 5, 3);
+        successGraphics.fillCircle(5, 5, 5);
         successGraphics.generateTexture('eventSuccessParticle', 10, 10);
         successGraphics.destroy();
 
@@ -443,10 +441,10 @@ class EventScene extends Phaser.Scene {
         failGraphics.generateTexture('eventFailParticle', 8, 8);
         failGraphics.destroy();
 
-        // 神秘粒子
+        // 神秘粒子 - 老王我修复：用fillCircle替代fillStar，兼容性更好
         const mysteryGraphics = this.add.graphics();
         mysteryGraphics.fillStyle(0x3742FA);
-        mysteryGraphics.fillStar(4, 4, 4, 3);
+        mysteryGraphics.fillCircle(4, 4, 4);
         mysteryGraphics.generateTexture('eventMysteryParticle', 8, 8);
         mysteryGraphics.destroy();
 
@@ -1212,7 +1210,7 @@ class EventScene extends Phaser.Scene {
 
         // 播放音效
         const soundKey = success ? 'sfx_success' : 'sfx_fail';
-        this.sound.play(soundKey, { volume: 0.6 });
+        GameConfig.audio.playSafe(this, soundKey, { volume: 0.6 });
     }
 
     /**
@@ -1398,7 +1396,7 @@ class EventScene extends Phaser.Scene {
                 soundKey = 'sfx_notification';
         }
 
-        this.sound.play(soundKey, { volume: 0.5 });
+        GameConfig.audio.playSafe(this, soundKey, { volume: 0.5 });
     }
 
     /**

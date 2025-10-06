@@ -1,0 +1,244 @@
+{
+  "recipes": [
+    {
+      "id": "healing_potion",
+      "name": "治疗药水",
+      "type": "healing",
+      "description": "恢复生命值的基础药水",
+      "materials": [
+        {"id": "moon_grass", "amount": 2},
+        {"id": "dew_drop", "amount": 1}
+      ],
+      "effects": {
+        "heal": 25,
+        "duration": 0
+      },
+      "difficulty": 1,
+      "value": 50
+    },
+    {
+      "id": "mana_potion",
+      "name": "法力药水",
+      "type": "mana",
+      "description": "恢复法力值的神奇药水",
+      "materials": [
+        {"id": "spring_water", "amount": 2},
+        {"id": "moon_grass", "amount": 1}
+      ],
+      "effects": {
+        "mana": 30,
+        "duration": 0
+      },
+      "difficulty": 1,
+      "value": 45
+    },
+    {
+      "id": "strength_potion",
+      "name": "力量药水",
+      "type": "buff",
+      "description": "增强力量的战斗药水",
+      "materials": [
+        {"id": "fire_grass", "amount": 2},
+        {"id": "dragon_scale", "amount": 1}
+      ],
+      "effects": {
+        "attack": 15,
+        "duration": 3
+      },
+      "difficulty": 2,
+      "value": 80
+    },
+    {
+      "id": "speed_potion",
+      "name": "速度药水",
+      "type": "buff",
+      "description": "提升行动速度的敏捷药水",
+      "materials": [
+        {"id": "dew_drop", "amount": 2},
+        {"id": "phoenix_feather", "amount": 1}
+      ],
+      "effects": {
+        "speed": 20,
+        "duration": 3
+      },
+      "difficulty": 2,
+      "value": 75
+    },
+    {
+      "id": "wisdom_potion",
+      "name": "智慧药水",
+      "type": "buff",
+      "description": "增强智力和魔法能力的药水",
+      "materials": [
+        {"id": "moon_grass", "amount": 3},
+        {"id": "unicorn_horn", "amount": 1}
+      ],
+      "effects": {
+        "intelligence": 25,
+        "duration": 5
+      },
+      "difficulty": 3,
+      "value": 120
+    },
+    {
+      "id": "love_potion",
+      "name": "爱情药水",
+      "type": "special",
+      "description": "让人陷入爱河的神奇药水",
+      "materials": [
+        {"id": "eternal_flower", "amount": 1},
+        {"id": "dew_drop", "amount": 3}
+      ],
+      "effects": {
+        "charm": 100,
+        "duration": 10
+      },
+      "difficulty": 4,
+      "value": 200
+    },
+    {
+      "id": "sleep_potion",
+      "name": "睡眠药水",
+      "type": "control",
+      "description": "让人陷入深度睡眠的控制药水",
+      "materials": [
+        {"id": "moon_grass", "amount": 2},
+        {"id": "time_sand", "amount": 1}
+      ],
+      "effects": {
+        "sleep": 5,
+        "duration": 0
+      },
+      "difficulty": 3,
+      "value": 90
+    },
+    {
+      "id": "luck_potion",
+      "name": "幸运药水",
+      "type": "buff",
+      "description": "提升幸运值的神秘药水",
+      "materials": [
+        {"id": "phoenix_feather", "amount": 2},
+        {"id": "dew_drop", "amount": 2}
+      ],
+      "effects": {
+        "luck": 30,
+        "duration": 7
+      },
+      "difficulty": 3,
+      "value": 150
+    },
+    {
+      "id": "fire_bomb",
+      "name": "火焰炸弹",
+      "type": "attack",
+      "description": "造成火焰爆炸伤害的攻击药水",
+      "materials": [
+        {"id": "fire_grass", "amount": 3},
+        {"id": "dragon_scale", "amount": 2}
+      ],
+      "effects": {
+        "fire_damage": 40,
+        "duration": 0
+      },
+      "difficulty": 4,
+      "value": 180
+    },
+    {
+      "id": "resurrection_potion",
+      "name": "复活药水",
+      "type": "special",
+      "description": "能够复活死者的传说级药水",
+      "materials": [
+        {"id": "phoenix_feather", "amount": 3},
+        {"id": "unicorn_horn", "amount": 2},
+        {"id": "soul_fragment", "amount": 1}
+      ],
+      "effects": {
+        "resurrection": 1,
+        "duration": 0
+      },
+      "difficulty": 5,
+      "value": 500
+    }
+  ],
+  "materials": [
+    {
+      "id": "moon_grass",
+      "name": "月光草",
+      "description": "在月光下生长的神奇草药",
+      "rarity": "common",
+      "value": 10
+    },
+    {
+      "id": "fire_grass",
+      "name": "火焰草",
+      "description": "生长在火山附近的炽热草药",
+      "rarity": "uncommon",
+      "value": 25
+    },
+    {
+      "id": "dew_drop",
+      "name": "晨露",
+      "description": "清晨第一缕阳光照射下的纯净露水",
+      "rarity": "common",
+      "value": 5
+    },
+    {
+      "id": "spring_water",
+      "name": "泉水",
+      "description": "来自深山的清澈泉水",
+      "rarity": "common",
+      "value": 8
+    },
+    {
+      "id": "dragon_scale",
+      "name": "龙鳞",
+      "description": "巨龙的鳞片，蕴含着强大的火元素力量",
+      "rarity": "rare",
+      "value": 100
+    },
+    {
+      "id": "phoenix_feather",
+      "name": "凤凰羽毛",
+      "description": "不死鸟的羽毛，拥有重生的力量",
+      "rarity": "rare",
+      "value": 120
+    },
+    {
+      "id": "demon_blood",
+      "name": "恶魔之血",
+      "description": "恶魔的精血，蕴含着黑暗力量",
+      "rarity": "rare",
+      "value": 80
+    },
+    {
+      "id": "unicorn_horn",
+      "name": "独角兽之角",
+      "description": "纯洁独角兽的角，拥有强大的净化力量",
+      "rarity": "epic",
+      "value": 200
+    },
+    {
+      "id": "time_sand",
+      "name": "时间之沙",
+      "description": "能够操控时间的神秘沙粒",
+      "rarity": "epic",
+      "value": 250
+    },
+    {
+      "id": "soul_fragment",
+      "name": "灵魂碎片",
+      "description": "破碎的灵魂碎片，蕴含着生命本质",
+      "rarity": "legendary",
+      "value": 500
+    },
+    {
+      "id": "eternal_flower",
+      "name": "永恒之花",
+      "description": "永不凋谢的神圣花朵，象征着永恒的爱",
+      "rarity": "legendary",
+      "value": 400
+    }
+  ]
+}

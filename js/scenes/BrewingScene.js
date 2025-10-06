@@ -105,16 +105,13 @@ class BrewingScene extends Phaser.Scene {
         const { width, height } = this.cameras.main;
 
         // 中央工作光源
-        const workLight = this.add.pointlight(width / 2, height / 2, 0xFFD700, 400, 0.6);
-        workLight.setAttenuation(0.05);
+        const workLight = this.add.pointlight(width / 2, height / 2, 0xFFD700, 400, 0.6, 0.05);
 
         // 坩埚光源
-        const cauldronLight = this.add.pointlight(width / 2, height - 200, 0xFF6348, 200, 0.8);
-        cauldronLight.setAttenuation(0.1);
+        const cauldronLight = this.add.pointlight(width / 2, height - 200, 0xFF6348, 200, 0.8, 0.1);
 
         // 材料光源
-        const materialLight = this.add.pointlight(150, height / 2, 0x00FF7F, 150, 0.5);
-        materialLight.setAttenuation(0.15);
+        const materialLight = this.add.pointlight(150, height / 2, 0x00FF7F, 150, 0.5, 0.15);
     }
 
     /**
@@ -133,7 +130,7 @@ class BrewingScene extends Phaser.Scene {
         this.createRecipePanelUI();
 
         // 底部控制面板
-        this.createControlPanel();
+        this.createControlButtons();
 
         // 状态显示
         this.createStatusDisplay();
@@ -192,7 +189,7 @@ class BrewingScene extends Phaser.Scene {
             Phaser.Geom.Rectangle.Contains);
 
         button.on('pointerdown', () => {
-            this.sound.play('sfx_click', { volume: 0.5 });
+            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.5 });
             this.scene.stop();
             this.scene.resume('TavernScene');
         });
@@ -491,8 +488,7 @@ class BrewingScene extends Phaser.Scene {
         this.cauldronZone.setInteractive();
 
         // 坩埚光源
-        const cauldronLight = this.add.pointlight(cauldronX, cauldronY, 0xFF6348, 100, 0.8);
-        cauldronLight.setAttenuation(0.1);
+        const cauldronLight = this.add.pointlight(cauldronX, cauldronY, 0xFF6348, 100, 0.8, 0.1);
 
         // 创建蒸汽效果
         this.createCauldronSteam(cauldronX, cauldronY - 30);
@@ -800,10 +796,10 @@ class BrewingScene extends Phaser.Scene {
      * 创建效果纹理
      */
     createEffectTextures() {
-        // 成功粒子
+        // 成功粒子 - 老王我修复：用fillCircle替代fillStar，兼容性更好
         const successGraphics = this.add.graphics();
         successGraphics.fillStyle(0x00FF7F);
-        successGraphics.fillStar(4, 4, 4, 3);
+        successGraphics.fillCircle(4, 4, 4);
         successGraphics.generateTexture('successParticle', 8, 8);
         successGraphics.destroy();
 
@@ -870,7 +866,7 @@ class BrewingScene extends Phaser.Scene {
         this.highlightDropZones(true);
 
         // 播放音效
-        this.sound.play('sfx_click', { volume: 0.3 });
+        GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.3 });
     }
 
     /**
@@ -928,7 +924,7 @@ class BrewingScene extends Phaser.Scene {
         }
 
         // 播放成功音效
-        this.sound.play('sfx_success', { volume: 0.4 });
+        GameConfig.audio.playSafe(this, 'sfx_success', { volume: 0.4 });
 
         // 显示成功效果
         this.showDropSuccessEffect(pointer.x, pointer.y);
@@ -944,7 +940,7 @@ class BrewingScene extends Phaser.Scene {
         }
 
         // 播放失败音效
-        this.sound.play('sfx_fail', { volume: 0.3 });
+        GameConfig.audio.playSafe(this, 'sfx_fail', { volume: 0.3 });
     }
 
     /**
@@ -1329,7 +1325,7 @@ class BrewingScene extends Phaser.Scene {
         this.updateStatus(`已选择配方: ${recipe.name}`);
 
         // 播放音效
-        this.sound.play('sfx_click', { volume: 0.3 });
+        GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.3 });
     }
 
     /**
@@ -1446,7 +1442,7 @@ class BrewingScene extends Phaser.Scene {
         this.setUIEnabled(false);
 
         // 播放制作音效
-        this.sound.play('sfx_potion_create', { volume: 0.5, loop: true });
+        GameConfig.audio.playSafe(this, 'sfx_potion_create', { volume: 0.5, loop: true });
     }
 
     /**
@@ -1559,8 +1555,7 @@ class BrewingScene extends Phaser.Scene {
     createBrewingGlow() {
         const { width, height } = this.cameras.main;
 
-        this.brewingGlow = this.add.pointlight(width / 2, height - 150, 0xFFD700, 150, 0.9);
-        this.brewingGlow.setAttenuation(0.05);
+        this.brewingGlow = this.add.pointlight(width / 2, height - 150, 0xFFD700, 150, 0.9, 0.05);
 
         // 发光脉动动画
         this.tweens.add({
@@ -1703,7 +1698,7 @@ class BrewingScene extends Phaser.Scene {
         this.showBrewingSuccessEffect(potion);
 
         // 播放成功音效
-        this.sound.play('sfx_success', { volume: 0.6 });
+        GameConfig.audio.playSafe(this, 'sfx_success', { volume: 0.6 });
 
         // 更新状态
         this.updateStatus(`成功制作 ${potion.name} (${potion.quality})！`);
@@ -1736,7 +1731,7 @@ class BrewingScene extends Phaser.Scene {
         this.showBrewingFailureEffect();
 
         // 播放失败音效
-        this.sound.play('sfx_fail', { volume: 0.6 });
+        GameConfig.audio.playSafe(this, 'sfx_fail', { volume: 0.6 });
 
         // 更新状态
         this.updateStatus(`制作失败！材料浪费了。`);
@@ -1798,9 +1793,7 @@ class BrewingScene extends Phaser.Scene {
         };
 
         // 品质光环
-        const qualityGlow = this.add.pointlight(width / 2, height - 150,
-            qualityColors[potion.quality], 100, 0.8);
-        qualityGlow.setAttenuation(0.1);
+        const qualityGlow = this.add.pointlight(width / 2, height - 150, qualityColors[potion.quality], 100, 0.8, 0.1);
 
         this.time.delayedCall(2000, () => {
             qualityGlow.destroy();

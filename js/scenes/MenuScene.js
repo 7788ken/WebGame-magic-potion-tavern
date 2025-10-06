@@ -236,7 +236,7 @@ class MenuScene extends Phaser.Scene {
                 bg.strokeRoundedRect(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight, 10);
 
                 // 播放悬停音效
-                this.sound.play('sfx_hover', { volume: 0.3 });
+                GameConfig.audio.playSafe(this, 'sfx_hover', { volume: 0.3 });
             });
 
             container.on('pointerout', () => {
@@ -274,7 +274,7 @@ class MenuScene extends Phaser.Scene {
                 });
 
                 // 播放点击音效
-                this.sound.play('sfx_click', { volume: 0.5 });
+                GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.5 });
 
                 // 执行按钮动作
                 onClick();
@@ -439,7 +439,7 @@ class MenuScene extends Phaser.Scene {
         this.setButtonSelected(availableButtons[newIndex], true);
 
         // 播放导航音效
-        this.sound.play('sfx_hover', { volume: 0.2 });
+        GameConfig.audio.playSafe(this, 'sfx_hover', { volume: 0.2 });
     }
 
     /**
@@ -500,7 +500,7 @@ class MenuScene extends Phaser.Scene {
      */
     playBackgroundMusic() {
         if (this.sound.get('bgm_main')) {
-            this.backgroundMusic = this.sound.play('bgm_main', {
+            this.backgroundMusic = GameConfig.audio.playSafe(this, 'bgm_main', {
                 loop: true,
                 volume: 0.4
             });
