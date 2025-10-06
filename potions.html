@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔药图鉴 - 魔药酒馆</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #2D1B69;
+            --gold: #FFD700;
+            --emerald: #00FF7F;
+            --dark-blue: #1A1A2E;
+            --ivory: #FFF8DC;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-purple) 100%);
+            color: var(--ivory);
+            overflow-x: hidden;
+        }
+        
+        .hero-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            background: linear-gradient(45deg, var(--gold), var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        
+        .magic-card {
+            background: rgba(45, 27, 105, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .magic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
+            border-color: var(--gold);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--gold);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .potion-card {
+            background: rgba(45, 27, 105, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .potion-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.4);
+            border-color: var(--gold);
+        }
+        
+        .potion-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .potion-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+        
+        .potion-card:hover .potion-icon::before {
+            opacity: 1;
+            animation: shine 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .attack-potion .potion-icon {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+        
+        .control-potion .potion-icon {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        .support-potion .potion-icon {
+            background: linear-gradient(45deg, #10b981, #059669);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        
+        .filter-btn {
+            background: rgba(45, 27, 105, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--ivory);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--gold);
+            color: var(--dark-blue);
+            border-color: var(--gold);
+        }
+        
+        .search-box {
+            background: rgba(45, 27, 105, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--ivory);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+        }
+        
+        .search-box::placeholder {
+            color: rgba(255, 248, 220, 0.6);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        
+        .recipe-item {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .potion-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .potion-detail-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, var(--primary-purple), var(--dark-blue));
+            border: 2px solid var(--gold);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .potion-detail-modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .brewing-simulator {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .cauldron {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #374151, #1f2937);
+            border: 4px solid #92400e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cauldron::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.3), transparent);
+            border-radius: 50%;
+            animation: bubble 2s ease-in-out infinite;
+        }
+        
+        @keyframes bubble {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+        }
+        
+        .material-slot {
+            width: 60px;
+            height: 60px;
+            border: 2px dashed rgba(255, 215, 0, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .material-slot:hover {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .material-slot.filled {
+            border-color: var(--emerald);
+            background: rgba(0, 255, 127, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 w-full bg-black bg-opacity-50 backdrop-blur-md z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold hero-title">魔药酒馆</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link text-lg font-medium">首页</a>
+                        <a href="gameplay.html" class="nav-link text-lg font-medium">玩法介绍</a>
+                        <a href="potions.html" class="nav-link text-lg font-medium text-gold">魔药图鉴</a>
+                        <a href="#about" class="nav-link text-lg font-medium">关于游戏</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 页面标题 -->
+    <section class="pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="hero-title text-5xl md:text-6xl font-bold mb-6">魔药图鉴</h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                探索神秘的魔药世界，收集和制作各种神奇的魔药
+            </p>
+        </div>
+    </section>
+    
+    <!-- 搜索和筛选 -->
+    <section class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
+                <div class="flex flex-wrap gap-3">
+                    <button class="filter-btn active" data-category="all">全部</button>
+                    <button class="filter-btn" data-category="attack">攻击类</button>
+                    <button class="filter-btn" data-category="control">控制类</button>
+                    <button class="filter-btn" data-category="support">辅助类</button>
+                </div>
+                <div class="w-full md:w-80">
+                    <input type="text" class="search-box" placeholder="搜索魔药名称或效果..." id="search-input">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 魔药展示网格 -->
+    <section class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="potions-grid">
+                <!-- 攻击类魔药 -->
+                <div class="potion-card attack-potion" data-category="attack" data-name="火焰药剂" data-effect="造成固定伤害">
+                    <div class="potion-icon">🔥</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-red-400">火焰药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">造成10点固定伤害</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🔥 火焰花 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 攻击类</div>
+                        <div>等级: 基础</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card attack-potion" data-category="attack" data-name="爆燃药剂" data-effect="造成伤害和灼烧">
+                    <div class="potion-icon">💥</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-red-400">爆燃药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">造成25点伤害+1回合灼烧(每回合5点伤害)</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🔥 火焰花 x2</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 攻击类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card attack-potion" data-category="attack" data-name="湮灭药剂" data-effect="造成大量伤害">
+                    <div class="potion-icon">💀</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-red-400">湮灭药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">造成50点伤害，无视对方10%防御</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🌑 暗影粉 x2</span>
+                            <span class="recipe-item">✨ 星辰砂 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 攻击类</div>
+                        <div>等级: 高级</div>
+                    </div>
+                </div>
+                
+                <!-- 控制类魔药 -->
+                <div class="potion-card control-potion" data-category="control" data-name="麻痹药剂" data-effect="使对方无法抽材料">
+                    <div class="potion-icon">⚡</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-blue-400">麻痹药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">使对方1回合无法抽材料</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">⚡ 雷电草 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 控制类</div>
+                        <div>等级: 基础</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card control-potion" data-category="control" data-name="沉睡药剂" data-effect="使对方沉睡">
+                    <div class="potion-icon">😴</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-blue-400">沉睡药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">使对方2回合无法抽材料+无法使用魔药</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🌙 月光草 x2</span>
+                            <span class="recipe-item">💧 露珠 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 控制类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card control-potion" data-category="control" data-name="混乱药剂" data-effect="反弹魔药效果">
+                    <div class="potion-icon">🌀</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-blue-400">混乱药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">使对方本回合使用的魔药效果反弹给自己</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🌀 混乱花 x2</span>
+                            <span class="recipe-item">🌑 暗影粉 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 控制类</div>
+                        <div>等级: 高级</div>
+                    </div>
+                </div>
+                
+                <!-- 辅助类魔药 -->
+                <div class="potion-card support-potion" data-category="support" data-name="治疗药剂" data-effect="恢复血量">
+                    <div class="potion-icon">💚</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">治疗药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">恢复10点血量</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🌿 治疗草 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 辅助类</div>
+                        <div>等级: 基础</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card support-potion" data-category="support" data-name="护盾药剂" data-effect="生成护盾">
+                    <div class="potion-icon">🛡️</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">护盾药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">生成20点护盾，持续2回合</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🪨 魔法石 x2</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 辅助类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card support-potion" data-category="support" data-name="增效药剂" data-effect="效果翻倍">
+                    <div class="potion-icon">⚡</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">增效药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">下1回合合成魔药效果翻倍</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">✨ 星辰砂 x2</span>
+                            <span class="recipe-item">🌟 星光粉 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 辅助类</div>
+                        <div>等级: 高级</div>
+                    </div>
+                </div>
+                
+                <!-- 更多魔药... -->
+                <div class="potion-card attack-potion" data-category="attack" data-name="冰霜药剂" data-effect="造成冰冻伤害">
+                    <div class="potion-icon">❄️</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-red-400">冰霜药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">造成15点伤害，降低对方10%攻击力</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">❄️ 冰晶花 x1</span>
+                            <span class="recipe-item">💧 露珠 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 攻击类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card control-potion" data-category="control" data-name="沉默药剂" data-effect="禁止魔药使用">
+                    <div class="potion-icon">🔇</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-blue-400">沉默药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">使对方1回合无法使用魔药</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">🌑 暗影粉 x1</span>
+                            <span class="recipe-item">🌿 静音草 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 控制类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card support-potion" data-category="support" data-name="净化药剂" data-effect="清除负面效果">
+                    <div class="potion-icon">✨</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-green-400">净化药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">清除所有负面效果，恢复5点血量</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">✨ 星辰砂 x1</span>
+                            <span class="recipe-item">🌿 净化草 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 辅助类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+                
+                <div class="potion-card attack-potion" data-category="attack" data-name="毒药剂" data-effect="持续毒伤害">
+                    <div class="potion-icon">☠️</div>
+                    <h3 class="text-xl font-bold mb-2 text-center text-red-400">毒药剂</h3>
+                    <p class="text-sm text-gray-300 mb-3 text-center">造成8点伤害，3回合内每回合损失3点血量</p>
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-400 mb-1">合成材料:</div>
+                        <div class="flex flex-wrap">
+                            <span class="recipe-item">☠️ 毒蘑菇 x1</span>
+                            <span class="recipe-item">🕷️ 蜘蛛毒 x1</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>类型: 攻击类</div>
+                        <div>等级: 中级</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 魔药制作模拟器 -->
+    <section class="py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-4 text-purple-400">魔药制作模拟器</h2>
+                <p class="text-lg text-gray-300">体验魔药制作的乐趣，尝试不同的材料组合</p>
+            </div>
+            
+            <div class="brewing-simulator">
+                <div class="grid md:grid-cols-3 gap-8 items-center">
+                    <!-- 材料选择 -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4 text-gold">选择材料</h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="material-slot" data-material="🌙" onclick="selectMaterial(this, '🌙', '月光草')">🌙</div>
+                            <div class="material-slot" data-material="💧" onclick="selectMaterial(this, '💧', '露珠')">💧</div>
+                            <div class="material-slot" data-material="🔥" onclick="selectMaterial(this, '🔥', '火焰花')">🔥</div>
+                            <div class="material-slot" data-material="🌑" onclick="selectMaterial(this, '🌑', '暗影粉')">🌑</div>
+                            <div class="material-slot" data-material="✨" onclick="selectMaterial(this, '✨', '星辰砂')">✨</div>
+                            <div class="material-slot" data-material="🌿" onclick="selectMaterial(this, '🌿', '魔法草')">🌿</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 坩埚 -->
+                    <div class="text-center">
+                        <div class="cauldron" id="cauldron">🧪</div>
+                        <div class="mt-4">
+                            <div class="text-sm text-gray-300 mb-2">已选材料:</div>
+                            <div id="selected-materials" class="flex justify-center space-x-2 flex-wrap">
+                                <div class="text-gray-500">点击材料添加到坩埚</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 制作按钮 -->
+                    <div class="text-center">
+                        <button class="bg-emerald text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-green-600 transition-colors mb-4" onclick="brewPotion()">
+                            开始制作
+                        </button>
+                        <div class="text-sm text-gray-300">
+                            <div id="brewing-result">选择材料开始制作</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 魔药详情模态框 -->
+    <div class="potion-detail-modal" id="potion-modal">
+        <div class="modal-content">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4" id="modal-icon">🧪</div>
+                <h2 class="text-3xl font-bold text-gold" id="modal-title">魔药名称</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-lg font-bold text-emerald mb-2">效果描述</h3>
+                    <p class="text-gray-300" id="modal-effect">魔药效果描述</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-2">合成配方</h3>
+                    <div id="modal-recipe" class="space-y-2">
+                        <!-- 配方内容 -->
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-purple-400 mb-2">魔药类型</h3>
+                        <p class="text-gray-300" id="modal-type">攻击类</p>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-red-400 mb-2">稀有度</h3>
+                        <p class="text-gray-300" id="modal-rarity">基础</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <button class="bg-gold text-black px-6 py-2 rounded font-bold hover:bg-yellow-400 transition-colors" onclick="closeModal()">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <footer class="bg-black bg-opacity-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="hero-title text-2xl font-bold mb-4">魔药酒馆</div>
+            <p class="text-gray-400 mb-4">© 2024 魔药酒馆游戏开发团队. 保留所有权利.</p>
+            <p class="text-gray-500 text-sm">在神秘的魔法世界中开启你的酒馆传奇</p>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+</body>
+</html>

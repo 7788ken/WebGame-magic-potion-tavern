@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>玩法介绍 - 魔药酒馆</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #2D1B69;
+            --gold: #FFD700;
+            --emerald: #00FF7F;
+            --dark-blue: #1A1A2E;
+            --ivory: #FFF8DC;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-purple) 100%);
+            color: var(--ivory);
+            overflow-x: hidden;
+        }
+        
+        .hero-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            background: linear-gradient(45deg, var(--gold), var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        
+        .magic-card {
+            background: rgba(45, 27, 105, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .magic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
+            border-color: var(--gold);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--gold);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .demo-section {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .resource-bar {
+            background: linear-gradient(90deg, var(--gold), var(--emerald));
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .potion-slot {
+            width: 60px;
+            height: 60px;
+            border: 2px dashed rgba(255, 215, 0, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .potion-slot:hover {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .potion-slot.filled {
+            border-color: var(--emerald);
+            background: rgba(0, 255, 127, 0.2);
+        }
+        
+        .battle-hp {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            height: 20px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .battle-hp::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.5s ease;
+        }
+        
+        .material-card {
+            background: rgba(45, 27, 105, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .material-card:hover {
+            transform: scale(1.05);
+            border-color: var(--gold);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .step-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--gold), var(--emerald));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 w-full bg-black bg-opacity-50 backdrop-blur-md z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold hero-title">魔药酒馆</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link text-lg font-medium">首页</a>
+                        <a href="gameplay.html" class="nav-link text-lg font-medium text-gold">玩法介绍</a>
+                        <a href="potions.html" class="nav-link text-lg font-medium">魔药图鉴</a>
+                        <a href="#about" class="nav-link text-lg font-medium">关于游戏</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 页面标题 -->
+    <section class="pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="hero-title text-5xl md:text-6xl font-bold mb-6">游戏玩法</h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                深入了解魔药酒馆的核心玩法系统，掌握经营与对战的精髓
+            </p>
+        </div>
+    </section>
+    
+    <!-- 经营系统 -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-gold">经营系统</h2>
+                <p class="text-lg text-gray-300">管理你的魔法酒馆，积累资源，解锁更多可能性</p>
+            </div>
+            
+            <!-- 经营演示界面 -->
+            <div class="demo-section">
+                <h3 class="text-2xl font-bold mb-6 text-center text-gold">酒馆管理界面</h3>
+                
+                <!-- 资源面板 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="magic-card p-4 text-center">
+                        <div class="text-2xl mb-2">💰</div>
+                        <div class="text-lg font-bold text-gold">金币</div>
+                        <div class="text-2xl font-bold" id="gold-count">1250</div>
+                    </div>
+                    <div class="magic-card p-4 text-center">
+                        <div class="text-2xl mb-2">🌿</div>
+                        <div class="text-lg font-bold text-emerald">材料</div>
+                        <div class="text-2xl font-bold" id="material-count">45</div>
+                    </div>
+                    <div class="magic-card p-4 text-center">
+                        <div class="text-2xl mb-2">👥</div>
+                        <div class="text-lg font-bold text-blue-400">员工</div>
+                        <div class="text-2xl font-bold" id="staff-count">3</div>
+                    </div>
+                    <div class="magic-card p-4 text-center">
+                        <div class="text-2xl mb-2">⭐</div>
+                        <div class="text-lg font-bold text-purple-400">等级</div>
+                        <div class="text-2xl font-bold" id="level-count">5</div>
+                    </div>
+                </div>
+                
+                <!-- 操作区域 -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- 材料采购 -->
+                    <div class="magic-card p-6">
+                        <h4 class="text-xl font-bold mb-4 text-gold">材料采购</h4>
+                        <div class="space-y-3">
+                            <div class="material-card" onclick="purchaseMaterial('月光草', 5)">
+                                <div class="text-2xl mb-2">🌙</div>
+                                <div class="font-bold">月光草</div>
+                                <div class="text-sm text-gold">5 金币</div>
+                            </div>
+                            <div class="material-card" onclick="purchaseMaterial('露珠', 8)">
+                                <div class="text-2xl mb-2">💧</div>
+                                <div class="font-bold">露珠</div>
+                                <div class="text-sm text-gold">8 金币</div>
+                            </div>
+                            <div class="material-card" onclick="purchaseMaterial('火焰花', 12)">
+                                <div class="text-2xl mb-2">🔥</div>
+                                <div class="font-bold">火焰花</div>
+                                <div class="text-sm text-gold">12 金币</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 魔药制作 -->
+                    <div class="magic-card p-6">
+                        <h4 class="text-xl font-bold mb-4 text-emerald">魔药制作</h4>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-300 mb-2">选择配方：</div>
+                            <select class="w-full bg-gray-800 text-white p-2 rounded" id="potion-recipe">
+                                <option value="healing">治疗药剂 (月光草 + 露珠)</option>
+                                <option value="fire">火焰药剂 (火焰花)</option>
+                                <option value="defense">护盾药剂 (月光草 + 火焰花)</option>
+                            </select>
+                        </div>
+                        <button class="w-full bg-emerald text-white py-2 rounded font-bold hover:bg-green-600 transition-colors" onclick="craftPotion()">
+                            制作魔药
+                        </button>
+                        <div class="mt-4 text-center">
+                            <div class="text-sm text-gray-300">制作进度</div>
+                            <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                                <div class="resource-bar w-0" id="crafting-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 销售管理 -->
+                    <div class="magic-card p-6">
+                        <h4 class="text-xl font-bold mb-4 text-blue-400">销售管理</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-800 rounded">
+                                <div>
+                                    <div class="font-bold">治疗药剂</div>
+                                    <div class="text-sm text-gray-400">库存: 5</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-gold font-bold">15 金币</div>
+                                    <button class="text-xs text-blue-400 hover:text-blue-300">调整价格</button>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-800 rounded">
+                                <div>
+                                    <div class="font-bold">火焰药剂</div>
+                                    <div class="text-sm text-gray-400">库存: 3</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-gold font-bold">25 金币</div>
+                                    <button class="text-xs text-blue-400 hover:text-blue-300">调整价格</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 对战系统 -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-emerald">对战系统</h2>
+                <p class="text-lg text-gray-300">策略性的魔药对战，考验你的智慧和反应能力</p>
+            </div>
+            
+            <!-- 对战演示界面 -->
+            <div class="demo-section">
+                <h3 class="text-2xl font-bold mb-6 text-center text-emerald">对战界面演示</h3>
+                
+                <!-- 对战状态 -->
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <!-- 玩家状态 -->
+                    <div class="magic-card p-6">
+                        <div class="text-center mb-4">
+                            <div class="text-2xl mb-2">🧙‍♂️</div>
+                            <div class="text-xl font-bold text-gold">玩家</div>
+                            <div class="text-sm text-gray-400">新手 1星</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>血量</span>
+                                <span id="player-hp">100/100</span>
+                            </div>
+                            <div class="battle-hp" id="player-hp-bar" style="--hp-percent: 100%"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="potion-slot" id="player-slot-1"></div>
+                            <div class="potion-slot" id="player-slot-2"></div>
+                            <div class="potion-slot" id="player-slot-3"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 对手状态 -->
+                    <div class="magic-card p-6">
+                        <div class="text-center mb-4">
+                            <div class="text-2xl mb-2">🧙‍♀️</div>
+                            <div class="text-xl font-bold text-red-400">对手</div>
+                            <div class="text-sm text-gray-400">新手 2星</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>血量</span>
+                                <span id="enemy-hp">85/100</span>
+                            </div>
+                            <div class="battle-hp" id="enemy-hp-bar" style="--hp-percent: 85%"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="potion-slot filled">🧪</div>
+                            <div class="potion-slot"></div>
+                            <div class="potion-slot filled">⚡</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 材料抽取区域 -->
+                <div class="text-center mb-6">
+                    <h4 class="text-xl font-bold mb-4 text-gold">材料池 (剩余: 6)</h4>
+                    <div class="grid grid-cols-6 md:grid-cols-10 gap-3 justify-center">
+                        <div class="material-card" onclick="drawMaterial(this)">
+                            <div class="text-xl">🌙</div>
+                            <div class="text-xs">月光草</div>
+                        </div>
+                        <div class="material-card" onclick="drawMaterial(this)">
+                            <div class="text-xl">💧</div>
+                            <div class="text-xs">露珠</div>
+                        </div>
+                        <div class="material-card" onclick="drawMaterial(this)">
+                            <div class="text-xl">🔥</div>
+                            <div class="text-xs">火焰花</div>
+                        </div>
+                        <div class="material-card" onclick="drawMaterial(this)">
+                            <div class="text-xl">🌑</div>
+                            <div class="text-xs">暗影粉</div>
+                        </div>
+                        <div class="material-card" onclick="drawMaterial(this)">
+                            <div class="text-xl">✨</div>
+                            <div class="text-xs">星辰砂</div>
+                        </div>
+                        <div class="material-card" onclick="drawMaterial(this)">
+                            <div class="text-xl">🌿</div>
+                            <div class="text-xs">魔法草</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 当前回合信息 -->
+                <div class="text-center">
+                    <div class="text-lg mb-4">第 <span id="current-round">3</span> 回合 / 共 6 回合</div>
+                    <div class="flex justify-center space-x-4">
+                        <button class="bg-gold text-black px-6 py-2 rounded font-bold hover:bg-yellow-400 transition-colors" onclick="endTurn()">
+                            结束回合
+                        </button>
+                        <button class="bg-emerald text-white px-6 py-2 rounded font-bold hover:bg-green-600 transition-colors" onclick="synthesizePotion()">
+                            合成魔药
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 新手引导 -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-purple-400">新手引导流程</h2>
+                <p class="text-lg text-gray-300">10分钟内掌握游戏核心玩法</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="magic-card p-6 text-center">
+                    <div class="step-indicator">1</div>
+                    <h3 class="text-xl font-bold mb-3 text-gold">经营基础</h3>
+                    <p class="text-gray-300 text-sm mb-4">
+                        学习材料采购、魔药制作和上架销售的基础操作
+                    </p>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• 采购第一批材料</li>
+                        <li>• 制作基础治疗药</li>
+                        <li>• 完成首次销售</li>
+                        <li>• 获得200金币奖励</li>
+                    </ul>
+                </div>
+                
+                <div class="magic-card p-6 text-center">
+                    <div class="step-indicator">2</div>
+                    <h3 class="text-xl font-bold mb-3 text-emerald">配方解锁</h3>
+                    <p class="text-gray-300 text-sm mb-4">
+                        通过经营解锁新的魔药配方和稀有材料
+                    </p>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• 销售10瓶基础药</li>
+                        <li>• 解锁麻痹药剂</li>
+                        <li>• 了解配方系统</li>
+                        <li>• 获得控制类魔药</li>
+                    </ul>
+                </div>
+                
+                <div class="magic-card p-6 text-center">
+                    <div class="step-indicator">3</div>
+                    <h3 class="text-xl font-bold mb-3 text-purple-400">对战入门</h3>
+                    <p class="text-gray-300 text-sm mb-4">
+                        参与新手教学对战，学习战斗系统
+                    </p>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• 匹配AI对手</li>
+                        <li>• 学习材料抽取</li>
+                        <li>• 掌握魔药使用</li>
+                        <li>• 获得第一名员工</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 页脚 -->
+    <footer class="bg-black bg-opacity-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="hero-title text-2xl font-bold mb-4">魔药酒馆</div>
+            <p class="text-gray-400 mb-4">© 2024 魔药酒馆游戏开发团队. 保留所有权利.</p>
+            <p class="text-gray-500 text-sm">在神秘的魔法世界中开启你的酒馆传奇</p>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+</body>
+</html>

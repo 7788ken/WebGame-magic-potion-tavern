@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔药酒馆 - 游戏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #2D1B69;
+            --gold: #FFD700;
+            --emerald: #00FF7F;
+            --dark-blue: #1A1A2E;
+            --ivory: #FFF8DC;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-purple) 100%);
+            color: var(--ivory);
+            overflow-x: hidden;
+        }
+        
+        .hero-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            background: linear-gradient(45deg, var(--gold), var(--emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        
+        .magic-card {
+            background: rgba(45, 27, 105, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .magic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+            border-color: var(--gold);
+        }
+        
+        .game-button {
+            background: linear-gradient(45deg, var(--primary-purple), var(--emerald));
+            box-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .game-button:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 127, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .game-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .resource-display {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+        
+        .material-item {
+            background: rgba(45, 27, 105, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .material-item:hover {
+            transform: scale(1.05);
+            border-color: var(--gold);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .material-item.selected {
+            border-color: var(--emerald);
+            background: rgba(0, 255, 127, 0.2);
+        }
+        
+        .potion-slot {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 2rem;
+        }
+        
+        .potion-slot:hover {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .potion-slot.filled {
+            border-color: var(--emerald);
+            background: rgba(0, 255, 127, 0.2);
+        }
+        
+        .battle-hp {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            height: 20px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .battle-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .game-tab {
+            background: rgba(45, 27, 105, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--ivory);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .game-tab.active {
+            background: var(--gold);
+            color: var(--dark-blue);
+            border-color: var(--gold);
+        }
+        
+        .game-tab:hover:not(.active) {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #10b981;
+        }
+        
+        .notification.error {
+            background: #ef4444;
+        }
+        
+        .notification.warning {
+            background: #f59e0b;
+        }
+        
+        .notification.info {
+            background: #3b82f6;
+        }
+        
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .game-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--emerald));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .cauldron {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #374151, #1f2937);
+            border: 4px solid #92400e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cauldron::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.3), transparent);
+            border-radius: 50%;
+            animation: bubble 2s ease-in-out infinite;
+        }
+        
+        @keyframes bubble {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子效果容器 -->
+    <div id="particles" class="particle-container"></div>
+    
+    <!-- 游戏内容 -->
+    <div class="game-content min-h-screen">
+        <!-- 导航栏 -->
+        <nav class="bg-black bg-opacity-50 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold hero-title">魔药酒馆</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="game-button px-4 py-2 rounded text-white font-bold" onclick="saveGame()">
+                            💾 保存游戏
+                        </button>
+                        <button class="game-button px-4 py-2 rounded text-white font-bold" onclick="resetGame()">
+                            🔄 重新开始
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- 资源显示栏 -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="resource-display text-center">
+                    <div class="text-2xl mb-1">💰</div>
+                    <div class="text-sm text-gray-400">金币</div>
+                    <div class="text-xl font-bold text-gold" id="gold-display">500</div>
+                </div>
+                <div class="resource-display text-center">
+                    <div class="text-2xl mb-1">⭐</div>
+                    <div class="text-sm text-gray-400">等级</div>
+                    <div class="text-xl font-bold text-purple-400" id="level-display">1</div>
+                </div>
+                <div class="resource-display text-center">
+                    <div class="text-2xl mb-1">🏆</div>
+                    <div class="text-sm text-gray-400">段位</div>
+                    <div class="text-xl font-bold text-emerald" id="rank-display">新手</div>
+                </div>
+                <div class="resource-display text-center">
+                    <div class="text-2xl mb-1">📅</div>
+                    <div class="text-sm text-gray-400">天数</div>
+                    <div class="text-xl font-bold text-blue-400" id="day-display">1</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 游戏标签 -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="game-tab active" data-tab="tavern" onclick="switchTab('tavern')">
+                    🏪 酒馆经营
+                </button>
+                <button class="game-tab" data-tab="battle" onclick="switchTab('battle')">
+                    ⚔️ 魔药对战
+                </button>
+                <button class="game-tab" data-tab="inventory" onclick="switchTab('inventory')">
+                    🎒 物品背包
+                </button>
+                <button class="game-tab" data-tab="staff" onclick="switchTab('staff')">
+                    👥 员工管理
+                </button>
+            </div>
+        </div>
+        
+        <!-- 酒馆经营界面 -->
+        <div id="tavern-tab" class="tab-content">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- 材料采购 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-gold">材料采购</h3>
+                        <div class="space-y-4" id="materials-shop">
+                            <!-- 材料列表将通过JavaScript生成 -->
+                        </div>
+                        <div class="mt-6 text-center">
+                            <button class="game-button px-6 py-3 rounded-full text-white font-bold" onclick="refreshMaterials()">
+                                🔄 刷新商品
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 魔药制作 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-emerald">魔药制作</h3>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-300 mb-2">选择配方：</div>
+                            <select class="w-full bg-gray-800 text-white p-3 rounded-lg" id="recipe-select">
+                                <option value="">请选择配方</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-300 mb-2">所需材料：</div>
+                            <div id="recipe-materials" class="text-sm text-gray-400">
+                                请先选择配方
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-300 mb-2">制作数量：</div>
+                            <div class="flex items-center space-x-2">
+                                <button class="game-button px-3 py-1 rounded text-white text-sm" onclick="adjustCraftAmount(-1)">-</button>
+                                <input type="number" id="craft-amount" value="1" min="1" max="99" class="w-16 bg-gray-800 text-white text-center rounded px-2 py-1">
+                                <button class="game-button px-3 py-1 rounded text-white text-sm" onclick="adjustCraftAmount(1)">+</button>
+                                <span class="text-sm text-gray-400">最大: <span id="max-craft-amount">1</span></span>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <button class="px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600" onclick="setCraftAmount(5)">5</button>
+                                <button class="px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600" onclick="setCraftAmount(10)">10</button>
+                                <button class="px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600" onclick="setCraftAmountMax()">最大</button>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-300 mb-2">制作速度：</div>
+                            <div class="flex items-center space-x-2">
+                                <button class="px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600" onclick="setCraftSpeed(0.5)">0.5x</button>
+                                <button class="px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600" onclick="setCraftSpeed(1)">1x</button>
+                                <button class="px-2 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-600" onclick="setCraftSpeed(2)">2x</button>
+                                <span class="text-xs text-gray-400">当前: <span id="current-speed">1x</span></span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="text-sm text-gray-300 mb-2">制作进度</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="crafting-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <button class="game-button w-full py-3 rounded-lg text-white font-bold" id="craft-button" onclick="craftPotion()">
+                                开始制作
+                            </button>
+                            <button class="game-button w-full py-2 rounded-lg text-white font-bold text-sm" onclick="toggleAutoCraft()" id="auto-craft-btn">
+                                🤖 自动制作: 关闭
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 销售管理 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-blue-400">销售管理</h3>
+                        <div class="space-y-3" id="inventory-list">
+                            <!-- 库存列表将通过JavaScript生成 -->
+                        </div>
+                        <div class="mt-6 text-center">
+                            <button class="game-button px-6 py-3 rounded-full text-white font-bold" onclick="nextDay()">
+                                ⏰ 结束今日经营
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 对战界面 -->
+        <div id="battle-tab" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4 text-emerald">魔药对战</h2>
+                    <p class="text-gray-300">与其他魔药师进行策略性对战</p>
+                </div>
+                
+                <!-- 对战状态 -->
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <!-- 玩家状态 -->
+                    <div class="magic-card p-6">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">🧙‍♂️</div>
+                            <div class="text-xl font-bold text-gold">玩家</div>
+                            <div class="text-sm text-gray-400">你</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>血量</span>
+                                <span id="player-hp-display">100/100</span>
+                            </div>
+                            <div class="battle-hp">
+                                <div class="battle-hp-fill" id="player-hp-bar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2" id="player-potions">
+                            <!-- 玩家魔药槽 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 对手状态 -->
+                    <div class="magic-card p-6">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">🧙‍♀️</div>
+                            <div class="text-xl font-bold text-red-400" id="opponent-name">对手</div>
+                            <div class="text-sm text-gray-400" id="opponent-rank">新手</div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>血量</span>
+                                <span id="opponent-hp-display">100/100</span>
+                            </div>
+                            <div class="battle-hp">
+                                <div class="battle-hp-fill" id="opponent-hp-bar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2" id="opponent-potions">
+                            <!-- 对手魔药槽 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 材料抽取区域 -->
+                <div class="magic-card p-6 mb-6">
+                    <div class="text-center mb-4">
+                        <h3 class="text-xl font-bold text-gold mb-2">材料池 (剩余: <span id="material-pool-count">10</span>)</h3>
+                        <p class="text-sm text-gray-400">每回合可抽取1种材料</p>
+                    </div>
+                    <div class="grid grid-cols-5 md:grid-cols-10 gap-3 justify-center" id="battle-materials">
+                        <!-- 材料池将通过JavaScript生成 -->
+                    </div>
+                </div>
+                
+                <!-- 战斗控制 -->
+                <div class="text-center">
+                    <div class="mb-4">
+                        <div class="text-lg mb-2">第 <span id="battle-round">1</span> 回合 / 共 6 回合</div>
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button class="game-button px-6 py-3 rounded text-white font-bold" id="end-turn-btn" onclick="endBattleTurn()">
+                            结束回合
+                        </button>
+                        <button class="game-button px-6 py-3 rounded text-white font-bold" onclick="findNewOpponent()">
+                            寻找新对手
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 物品背包界面 -->
+        <div id="inventory-tab" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4 text-purple-400">物品背包</h2>
+                    <p class="text-gray-300">管理你的魔药和材料</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- 材料列表 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-gold">材料库存</h3>
+                        <div class="grid grid-cols-3 gap-4" id="material-inventory">
+                            <!-- 材料库存将通过JavaScript生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 魔药列表 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-emerald">魔药库存</h3>
+                        <div class="space-y-3" id="potion-inventory">
+                            <!-- 魔药库存将通过JavaScript生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 员工管理界面 -->
+        <div id="staff-tab" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold mb-4 text-blue-400">员工管理</h2>
+                    <p class="text-gray-300">招募和管理你的酒馆员工</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- 现有员工 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-gold">现有员工</h3>
+                        <div class="space-y-4" id="current-staff">
+                            <!-- 现有员工列表 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 招募员工 -->
+                    <div class="magic-card rounded-2xl p-6">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-emerald">招募员工</h3>
+                        <div class="space-y-4" id="available-staff">
+                            <!-- 可招募员工列表 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知容器 -->
+    <div id="notification-container"></div>
+    
+    <script src="game-fixed.js"></script>
+</body>
+</html>
