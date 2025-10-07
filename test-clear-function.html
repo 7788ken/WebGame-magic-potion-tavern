@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试一键清空功能</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-button { background: #3498db; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; }
+        .test-button:hover { background: #2980b9; }
+        .error-button { background: #e74c3c; }
+        .error-button:hover { background: #c0392b; }
+        .success-button { background: #27ae60; }
+        .success-button:hover { background: #229954; }
+        .warning-button { background: #f39c12; }
+        .warning-button:hover { background: #e67e22; }
+        .info-box { background: #ecf0f1; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #3498db; }
+    </style>
+</head>
+<body>
+    <h1>🧪 一键清空功能测试</h1>
+
+    <div class="test-section">
+        <h3>📊 当前错误统计</h3>
+        <div id="current-stats" class="info-box">
+            <p>正在加载错误统计...</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🎯 测试操作</h3>
+        <button class="test-button" onclick="generateTestError()">生成测试错误</button>
+        <button class="test-button error-button" onclick="clearErrorsWithConfirm()">一键清空错误</button>
+        <button class="test-button success-button" onclick="showErrorReport()">显示错误报告</button>
+        <button class="test-button warning-button" onclick="exportErrorReport()">导出错误报告</button>
+    </div>
+
+    <div class="test-section">
+        <h3>✅ 测试结果</h3>
+        <div id="test-result" class="info-box">
+            <p>等待测试...</p>
+        </div>
+    </div>
+
+    <!-- 老王错误管理器 -->
+    <script src="js/utils/ErrorManager.js"></script>
+    <script src="main.js"></script>
+
+    <script>
+        // 更新错误统计
+        function updateStats() {
+            const stats = getErrorStats();
+            const statsDiv = document.getElementById('current-stats');
+
+            if (stats && stats.total > 0) {
+                statsDiv.innerHTML = `
+                    <p>📈 总错误数: <strong>${stats.total}</strong></p>
+                    <p>🔴 高危错误: ${stats.bySeverity.high}</p>
+                    <p>🟡 中危错误: ${stats.bySeverity.medium}</p>
+                    <p>🟢 低危错误: ${stats.bySeverity.low}</p>
+                    <p>⏰ 最近错误: ${stats.recent.length ? new Date(stats.recent[stats.recent.length-1].timestamp).toLocaleTimeString() : '无'}</p>
+                `;
+            } else {
+                statsDiv.innerHTML = '<p>✅ 当前没有错误记录</p>';
+            }
+        }
+
+        // 生成测试错误
+        function generateTestError() {
+            try {
+                // 故意制造一个类型错误
+                const obj = null;
+                obj.someMethod();
+            } catch (error) {
+                console.log('测试错误已生成');
+            }
+
+            setTimeout(() => {
+                updateStats();
+                showResult('✅ 测试错误已生成并收集');
+            }, 100);
+        }
+
+        // 一键清空错误（带确认）
+        function clearErrorsWithConfirm() {
+            const stats = getErrorStats();
+            if (!stats || stats.total === 0) {
+                showResult('ℹ️ 当前没有错误需要清空');
+                return;
+            }
+
+            if (confirm(`确定要清空所有 ${stats.total} 个错误日志吗？此操作不可恢复！`)) {
+                try {
+                    clearErrorLog();
+                    updateStats();
+                    showResult('🗑️ 错误日志已清空成功！');
+                } catch (error) {
+                    showResult('❌ 清空失败: ' + error.message);
+                }
+            } else {
+                showResult('ℹ️ 已取消清空操作');
+            }
+        }
+
+        // 显示测试结果
+        function showResult(message) {
+            document.getElementById('test-result').innerHTML = `<p>${message}</p><p>时间: ${new Date().toLocaleTimeString()}</p>`;
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+
+            // 定期更新统计
+            setInterval(updateStats, 2000);
+
+            showResult('✅ 测试系统已就绪，可以开始测试一键清空功能');
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Shift+D 生成测试错误
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                e.preventDefault();
+                generateTestError();
+            }
+            // Ctrl+Shift+X 一键清空
+            if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+                e.preventDefault();
+                clearErrorsWithConfirm();
+            }
+        });
+    </script>
+</body>
+</html>

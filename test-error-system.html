@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老王错误系统测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+        .error-button {
+            background: #e74c3c;
+        }
+        .error-button:hover {
+            background: #c0392b;
+        }
+        .warning-button {
+            background: #f39c12;
+        }
+        .warning-button:hover {
+            background: #e67e22;
+        }
+        .success-button {
+            background: #27ae60;
+        }
+        .success-button:hover {
+            background: #229954;
+        }
+        .info-box {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 0;
+        }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍺 魔药酒馆 - 老王错误系统测试</h1>
+
+    <div class="test-section">
+        <h3>📋 系统信息</h3>
+        <div id="system-info" class="info-box">
+            <p>正在初始化错误管理系统...</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 错误类型测试</h3>
+        <p>点击下面的按钮测试不同类型的错误收集：</p>
+
+        <button class="test-button error-button" onclick="testSyntaxError()">语法错误</button>
+        <button class="test-button error-button" onclick="testTypeError()">类型错误</button>
+        <button class="test-button error-button" onclick="testReferenceError()">引用错误</button>
+        <button class="test-button warning-button" onclick="testNetworkError()">网络错误</button>
+        <button class="test-button warning-button" onclick="testResourceError()">资源错误</button>
+        <button class="test-button" onclick="testPromiseError()">Promise错误</button>
+        <button class="test-button" onclick="testManualError()">手动错误</button>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 系统功能测试</h3>
+        <p>测试错误管理系统的各项功能：</p>
+
+        <button class="test-button success-button" onclick="showErrorReport()">显示错误报告</button>
+        <button class="test-button success-button" onclick="showErrorStats()">显示错误统计</button>
+        <button class="test-button" onclick="exportErrorReport()">导出错误报告</button>
+        <button class="test-button warning-button" onclick="clearErrorLog()">清空错误日志</button>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 错误统计</h3>
+        <div id="error-stats" class="info-box">
+            <p>暂无错误统计信息</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>💡 使用说明</h3>
+        <div class="info-box">
+            <p><strong>快捷键：</strong></p>
+            <ul>
+                <li><code>Ctrl+Shift+E</code> - 显示错误报告</li>
+                <li><code>Ctrl+Shift+C</code> - 清空错误日志</li>
+            </ul>
+            <p><strong>功能说明：</strong></p>
+            <ul>
+                <li>错误会自动收集并分类（语法、类型、网络等）</li>
+                <li>严重错误会实时显示通知</li>
+                <li>所有错误都会保存到localStorage中</li>
+                <li>可以导出JSON格式的错误报告</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 老王错误管理器 -->
+    <script src="js/utils/ErrorManager.js?v=20251007"></script>
+    <script src="main.js?v=20251007"></script>
+
+    <script>
+        // 系统初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSystemInfo();
+            updateErrorStats();
+
+            // 定期更新统计信息
+            setInterval(updateErrorStats, 5000);
+        });
+
+        // 更新系统信息
+        function updateSystemInfo() {
+            const infoDiv = document.getElementById('system-info');
+
+            if (typeof errorManager !== 'undefined') {
+                infoDiv.innerHTML = `
+                    <p>✅ 老王错误管理系统已初始化完成！</p>
+                    <p>📊 错误收集器状态: 运行中</p>
+                    <p>🎯 错误分类: 8种类型</p>
+                    <p>💾 存储方式: localStorage</p>
+                    <p>🔄 自动保存: 已启用</p>
+                `;
+            } else {
+                infoDiv.innerHTML = `
+                    <p>❌ 错误管理系统初始化失败！</p>
+                    <p>请检查控制台错误信息。</p>
+                `;
+            }
+        }
+
+        // 更新错误统计
+        function updateErrorStats() {
+            if (typeof getErrorStats === 'function') {
+                const stats = getErrorStats();
+                const statsDiv = document.getElementById('error-stats');
+
+                if (stats) {
+                    statsDiv.innerHTML = `
+                        <p>📈 总错误数: <strong>${stats.total}</strong></p>
+                        <p>🔴 高危错误: ${stats.bySeverity.high || 0}</p>
+                        <p>🟡 中危错误: ${stats.bySeverity.medium || 0}</p>
+                        <p>🟢 低危错误: ${stats.bySeverity.low || 0}</p>
+                        <p>🏷️ 最近5个错误: </p>
+                        <ul>
+                            ${stats.recent.map(err => `
+                                <li>${new Date(err.timestamp).toLocaleTimeString()}: ${err.title}</li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } else {
+                    statsDiv.innerHTML = '<p>暂无错误统计信息</p>';
+                }
+            }
+        }
+
+        // 测试函数
+        function testSyntaxError() {
+            try {
+                eval('const x = {');  // 故意制造语法错误
+            } catch (error) {
+                console.log('语法错误已触发');
+            }
+        }
+
+        function testTypeError() {
+            try {
+                const obj = null;
+                obj.someMethod();  // 故意制造类型错误
+            } catch (error) {
+                console.log('类型错误已触发');
+            }
+        }
+
+        function testReferenceError() {
+            try {
+                undefinedFunction();  // 故意制造引用错误
+            } catch (error) {
+                console.log('引用错误已触发');
+            }
+        }
+
+        function testNetworkError() {
+            // 模拟网络错误
+            fetch('https://nonexistent-domain-12345.com/api/data')
+                .catch(error => {
+                    console.log('网络错误已触发');
+                    // 手动报告网络错误给ErrorManager
+                    if (typeof reportError === 'function') {
+                        reportError(`网络请求失败: ${error.message}`, 'medium');
+                    }
+                });
+        }
+
+        function testResourceError() {
+            // 创建不存在的图片
+            const img = new Image();
+            img.src = 'https://nonexistent-domain-12345.com/image.png';
+            document.body.appendChild(img);
+            console.log('资源错误已触发');
+        }
+
+        function testPromiseError() {
+            // 创建被拒绝的Promise
+            Promise.reject(new Error('测试Promise错误'));
+            console.log('Promise错误已触发');
+        }
+
+        function testManualError() {
+            if (typeof reportError === 'function') {
+                reportError('这是一个手动测试错误', 'medium');
+                alert('手动错误已添加！');
+            } else {
+                alert('错误管理器未初始化！');
+            }
+        }
+
+        function showErrorReport() {
+            if (typeof errorManager !== 'undefined' && errorManager.showErrorReport) {
+                errorManager.showErrorReport();
+            } else {
+                alert('错误报告功能未初始化！');
+            }
+        }
+
+        function showErrorStats() {
+            updateErrorStats();
+            alert('错误统计已更新！');
+        }
+
+        function exportErrorReport() {
+            if (typeof window.exportErrorReport === 'function') {
+                window.exportErrorReport();
+                alert('错误报告已导出！');
+            } else {
+                alert('导出功能未初始化！');
+            }
+        }
+
+        function clearErrorLog() {
+            if (typeof errorManager !== 'undefined' && errorManager.clearErrors) {
+                const stats = getErrorStats();
+                if (stats && stats.total > 0) {
+                    if (confirm(`确定要清空所有 ${stats.total} 个错误日志吗？`)) {
+                        errorManager.clearErrors();
+                        updateErrorStats();
+                        // 使用更友好的通知方式替代alert
+                        const notification = document.createElement('div');
+                        notification.style.cssText = `
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            background: #27ae60;
+                            color: white;
+                            padding: 15px 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                            z-index: 10000;
+                            font-family: Arial, sans-serif;
+                            animation: slideIn 0.3s ease-out;
+                        `;
+                        notification.textContent = '✅ 错误日志已清空！';
+                        document.body.appendChild(notification);
+
+                        // 3秒后自动移除
+                        setTimeout(() => {
+                            if (notification.parentElement) {
+                                notification.remove();
+                            }
+                        }, 3000);
+                    }
+                } else {
+                    alert('当前没有错误日志需要清空');
+                }
+            } else {
+                alert('错误管理器未初始化！');
+            }
+        }
+    </script>
+</body>
+</html>

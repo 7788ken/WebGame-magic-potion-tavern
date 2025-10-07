@@ -233,11 +233,26 @@ const GameConfig = {
                     return false;
                 }
 
-                // 检查音频是否存在
-                const sound = scene.sound.get(soundKey);
-                if (!sound) {
-                    console.warn(`⚠️ 音频播放失败: 音频键 '${soundKey}' 未找到`);
+                // 检查音频缓存是否存在（检查是否已加载）
+                if (!scene.cache.audio.exists(soundKey)) {
+                    console.warn(`⚠️ 音频播放失败: 音频键 '${soundKey}' 未在缓存中找到`);
                     return false;
+                }
+
+                // 检查音频是否存在（检查是否已添加到音频系统）
+                let sound = scene.sound.get(soundKey);
+                if (!sound) {
+                    // 如果音频不存在，尝试添加到音频系统
+                    try {
+                        sound = scene.sound.add(soundKey);
+                        if (!sound) {
+                            console.warn(`⚠️ 音频播放失败: 无法添加音频 '${soundKey}' 到音频系统`);
+                            return false;
+                        }
+                    } catch (addError) {
+                        console.warn(`⚠️ 音频播放失败: 添加音频 '${soundKey}' 失败: ${addError.message}`);
+                        return false;
+                    }
                 }
 
                 // 设置默认配置

@@ -261,14 +261,14 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('material_moon_grass', 'assets/materials/moon_grass.png.svg');
         this.load.image('material_fire_grass', 'assets/materials/fire_grass.png.svg');
         this.load.image('material_dew_drop', 'assets/materials/dew_drop.png.svg');
-        this.load.image('material_spring_water', 'assets/materials/spring_water.png.svg');
-        this.load.image('material_dragon_scale', 'assets/materials/dragon_scale.png.svg');
-        this.load.image('material_phoenix_feather', 'assets/materials/phoenix_feather.png.svg');
-        this.load.image('material_demon_blood', 'assets/materials/demon_blood.png.svg');
-        this.load.image('material_unicorn_horn', 'assets/materials/unicorn_horn.png.svg');
-        this.load.image('material_time_sand', 'assets/materials/time_sand.png.svg');
-        this.load.image('material_soul_fragment', 'assets/materials/soul_fragment.png.svg');
-        this.load.image('material_eternal_flower', 'assets/materials/eternal_flower.png.svg');
+        this.load.image('material_spring_water', 'assets/materials/dew_drop.png.svg');
+        this.load.image('material_dragon_scale', 'assets/materials/dark_essence.png.svg');
+        this.load.image('material_phoenix_feather', 'assets/materials/light_shard.png.svg');
+        this.load.image('material_demon_blood', 'assets/materials/fire_grass.png.svg');
+        this.load.image('material_unicorn_horn', 'assets/materials/earth_root.png.svg');
+        this.load.image('material_time_sand', 'assets/materials/moon_grass.png.svg');
+        this.load.image('material_soul_fragment', 'assets/materials/ice_crystal.png.svg');
+        this.load.image('material_eternal_flower', 'assets/materials/thunder_stone.png.svg');
     }
 
     /**
@@ -306,7 +306,7 @@ class PreloadScene extends Phaser.Scene {
 
         // 音效 - 使用WAV格式
         this.load.audio('sfx_click', 'assets/audio/click.wav');
-        this.load.audio('sfx_hover', 'assets/audio/hover.wav');
+        this.load.audio('sfx_hover', 'assets/audio/hover_sound.mp3');
         this.load.audio('sfx_success', 'assets/audio/success.wav');
         this.load.audio('sfx_fail', 'assets/audio/fail.wav');
         this.load.audio('sfx_potion_create', 'assets/audio/potion_create.wav');
@@ -453,8 +453,10 @@ class PreloadScene extends Phaser.Scene {
         if (this.percentText) this.percentText.destroy();
         if (this.progressBar) this.progressBar.destroy();
 
-        // 播放完成音效 - 老王我使用安全音频播放函数
-        GameConfig.audio.playSafe(this, 'sfx_success', { volume: 0.5 });
+        // 延迟播放完成音效 - 等待音频系统完全初始化
+        this.time.delayedCall(500, () => {
+            GameConfig.audio.playSafe(this, 'sfx_success', { volume: 0.5 });
+        });
     }
 
     /**
@@ -520,10 +522,12 @@ class PreloadScene extends Phaser.Scene {
         // 设置音频配置
         this.sound.volume = 0.7;
 
-        // 预加载背景音乐 - 使用安全音频播放
-        GameConfig.audio.playSafe(this, 'bgm_main', {
-            loop: true,
-            volume: 0.3
+        // 延迟播放背景音乐 - 等待音频系统完全初始化
+        this.time.delayedCall(1000, () => {
+            GameConfig.audio.playSafe(this, 'bgm_main', {
+                loop: true,
+                volume: 0.3
+            });
         });
 
         console.log('✅ PreloadScene: 音频管理器设置完成');

@@ -661,7 +661,7 @@ class EventGenerator {
         // 检查概率
         const chance = EventUtils.calculateEventChance(event, gameState);
         return Math.random() < chance;
-    },
+    }
 
     /**
      * 检查调度要求
@@ -677,7 +677,7 @@ class EventGenerator {
             default:
                 return true;
         }
-    },
+    }
 
     /**
      * 创建事件实例
@@ -691,14 +691,14 @@ class EventGenerator {
             active: true,
             completed: false
         };
-    },
+    }
 
     /**
      * 获取所有事件定义
      */
     getAllEvents() {
         return RandomEvents;
-    },
+    }
 
     /**
      * 生成事件ID

@@ -822,7 +822,7 @@ class PotionManager {
             typeCounts[potion.type] = (typeCounts[potion.type] || 0) + 1;
         });
 
-        this.stats.mostPopularType = Object.keys(typeCounts).reduce((a, b) =
+        this.stats.mostPopularType = Object.keys(typeCounts).reduce((a, b) =>
             typeCounts[a] > typeCounts[b] ? a : b, 'unknown'
         );
     }

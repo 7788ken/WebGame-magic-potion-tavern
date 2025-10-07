@@ -10,14 +10,80 @@ let gameState = {
     currentRound: 3
 };
 
+// 老王动画兼容函数 - 处理anime.js未加载的情况
+function safeAnime(config) {
+    if (typeof anime !== 'undefined') {
+        return anime(config);
+    } else {
+        console.log('ℹ️ anime.js未加载，使用CSS动画替代');
+        // 简单的CSS动画回退
+        if (config.targets) {
+            const targets = Array.isArray(config.targets) ? config.targets : [config.targets];
+            targets.forEach(target => {
+                if (typeof target === 'string') {
+                    const elements = document.querySelectorAll(target);
+                    elements.forEach(el => {
+                        if (config.scale !== undefined) {
+                            el.style.transform = `scale(${config.scale})`;
+                        }
+                        if (config.opacity !== undefined) {
+                            el.style.opacity = config.opacity;
+                        }
+                        if (config.translateY !== undefined) {
+                            el.style.transform += ` translateY(${config.translateY}px)`;
+                        }
+                    });
+                }
+            });
+        }
+        // 模拟anime.js的complete回调
+        if (config.complete) {
+            setTimeout(config.complete, config.duration || 300);
+        }
+        return {
+            pause: () => {},
+            play: () => {},
+            restart: () => {}
+        };
+    }
+}
+
+// 老王错误管理器 - 专门收集SB报错
+// 注意：ErrorManager.js已经创建了全局errorManager实例，这里不要重复声明
+
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    initializeAnimations();
-    initializeParticles();
-    initializeInteractions();
-    initializePotionFiltering();
-    initializePotionModal();
-    initializeBrewingSimulator();
+    // 检查errorManager是否已存在（由ErrorManager.js创建）
+    if (typeof errorManager !== 'undefined') {
+        console.log('✅ 老王错误管理系统已启动');
+    } else {
+        console.error('❌ 错误管理器未找到');
+    }
+
+    // 包装所有初始化函数，捕获可能的错误
+    const initFunctions = [
+        { name: '动画系统', func: initializeAnimations },
+        { name: '粒子系统', func: initializeParticles },
+        { name: '交互系统', func: initializeInteractions },
+        { name: '魔药筛选', func: initializePotionFiltering },
+        { name: '魔药弹窗', func: initializePotionModal },
+        { name: '制作模拟器', func: initializeBrewingSimulator }
+    ];
+
+    initFunctions.forEach(({ name, func }) => {
+        try {
+            func();
+            console.log(`✅ ${name}初始化完成`);
+        } catch (error) {
+            console.error(`❌ ${name}初始化失败:`, error);
+            errorManager.addError({
+                type: 'initialization',
+                message: `${name}初始化失败: ${error.message}`,
+                stack: error.stack,
+                severity: 'high'
+            });
+        }
+    });
 });
 
 // 初始化动画
@@ -52,7 +118,7 @@ function initializeAnimations() {
     const cards = document.querySelectorAll('.magic-card, .potion-card');
     cards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            anime({
+            safeAnime({
                 targets: this,
                 scale: 1.02,
                 duration: 300,
@@ -61,7 +127,7 @@ function initializeAnimations() {
         });
         
         card.addEventListener('mouseleave', function() {
-            anime({
+            safeAnime({
                 targets: this,
                 scale: 1,
                 duration: 300,
@@ -79,7 +145,7 @@ function initializeAnimations() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                anime({
+                safeAnime({
                     targets: entry.target,
                     opacity: [0, 1],
                     translateY: [30, 0],
@@ -186,7 +252,7 @@ function initializeInteractions() {
     const buttons = document.querySelectorAll('.glow-button, button');
     buttons.forEach(button => {
         button.addEventListener('mouseenter', function() {
-            anime({
+            safeAnime({
                 targets: this,
                 scale: 1.05,
                 duration: 200,
@@ -195,12 +261,16 @@ function initializeInteractions() {
         });
         
         button.addEventListener('mouseleave', function() {
-            anime({
-                targets: this,
-                scale: 1,
-                duration: 200,
-                easing: 'easeOutQuad'
-            });
+            if (typeof anime !== 'undefined') {
+                safeAnime({
+                    targets: this,
+                    scale: 1,
+                    duration: 200,
+                    easing: 'easeOutQuad'
+                });
+            } else {
+                this.style.transform = 'scale(1)';
+            }
         });
     });
 }
@@ -212,14 +282,16 @@ function purchaseMaterial(materialName, cost) {
         gameState.materials += 1;
         
         // 更新显示
-        document.getElementById('gold-count').textContent = gameState.gold;
-        document.getElementById('material-count').textContent = gameState.materials;
+        const goldElement = document.getElementById('gold-count');
+        const materialElement = document.getElementById('material-count');
+        if (goldElement) goldElement.textContent = gameState.gold;
+        if (materialElement) materialElement.textContent = gameState.materials;
         
         // 显示购买成功动画
         showNotification(`成功购买 ${materialName}！`, 'success');
         
         // 添加购买动画
-        anime({
+        safeAnime({
             targets: event.target,
             scale: [1, 1.1, 1],
             duration: 300,
@@ -236,10 +308,11 @@ function craftPotion() {
     
     if (gameState.materials >= 2) {
         gameState.materials -= 2;
-        document.getElementById('material-count').textContent = gameState.materials;
+        const materialElement = document.getElementById('material-count');
+        if (materialElement) materialElement.textContent = gameState.materials;
         
         // 制作进度动画
-        anime({
+        safeAnime({
             targets: progressBar,
             width: '100%',
             duration: 2000,
@@ -265,7 +338,7 @@ function drawMaterial(element) {
     element.style.pointerEvents = 'none';
     
     // 添加抽取动画
-    anime({
+    safeAnime({
         targets: element,
         scale: [1, 1.2, 0.8],
         duration: 500,
@@ -277,16 +350,21 @@ function drawMaterial(element) {
 
 function endTurn() {
     gameState.currentRound++;
-    document.getElementById('current-round').textContent = gameState.currentRound;
-    
+    const roundElement = document.getElementById('current-round');
+    const hpElement = document.getElementById('enemy-hp');
+    const hpBarElement = document.getElementById('enemy-hp-bar');
+
+    if (roundElement) roundElement.textContent = gameState.currentRound;
+
     // 模拟战斗结果
     const damage = Math.floor(Math.random() * 20) + 10;
     gameState.enemyHP = Math.max(0, gameState.enemyHP - damage);
-    document.getElementById('enemy-hp').textContent = `${gameState.enemyHP}/100`;
-    
+
+    if (hpElement) hpElement.textContent = `${gameState.enemyHP}/100`;
+
     // 更新血条
     const hpPercent = (gameState.enemyHP / 100) * 100;
-    document.getElementById('enemy-hp-bar').style.setProperty('--hp-percent', `${hpPercent}%`);
+    if (hpBarElement) hpBarElement.style.setProperty('--hp-percent', `${hpPercent}%`);
     
     showNotification(`对敌人造成 ${damage} 点伤害！`, 'success');
     
@@ -305,7 +383,7 @@ function synthesizePotion() {
     }
     
     // 模拟合成
-    anime({
+    safeAnime({
         targets: '#cauldron',
         rotate: [0, 360],
         scale: [1, 1.2, 1],
@@ -322,23 +400,31 @@ function initializePotionFiltering() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const searchInput = document.getElementById('search-input');
     const potionCards = document.querySelectorAll('.potion-card');
-    
+
+    // 检查必要元素是否存在（避免在test-error-system.html等页面报错）
+    if (!searchInput || filterButtons.length === 0) {
+        console.log('ℹ️ 魔药筛选元素不存在，跳过初始化');
+        return;
+    }
+
     // 筛选按钮
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
             // 更新按钮状态
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            
+
             const category = this.dataset.category;
             filterPotions(category, searchInput.value);
         });
     });
-    
+
     // 搜索功能
     searchInput.addEventListener('input', function() {
-        const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
-        filterPotions(activeCategory, this.value);
+        const activeCategory = document.querySelector('.filter-btn.active');
+        if (activeCategory) {
+            filterPotions(activeCategory.dataset.category, this.value);
+        }
     });
     
     // 魔药卡片点击事件
@@ -366,7 +452,7 @@ function filterPotions(category, searchTerm) {
         
         if (matchesCategory && matchesSearch) {
             card.style.display = 'block';
-            anime({
+            safeAnime({
                 targets: card,
                 opacity: [0, 1],
                 scale: [0.8, 1],
@@ -374,7 +460,7 @@ function filterPotions(category, searchTerm) {
                 easing: 'easeOutQuad'
             });
         } else {
-            anime({
+            safeAnime({
                 targets: card,
                 opacity: [1, 0],
                 scale: [1, 0.8],
@@ -391,7 +477,13 @@ function filterPotions(category, searchTerm) {
 // 魔药详情模态框
 function initializePotionModal() {
     const modal = document.getElementById('potion-modal');
-    
+
+    // 检查元素是否存在（避免在test-error-system.html等页面报错）
+    if (!modal) {
+        console.log('ℹ️ 魔药模态框不存在，跳过初始化');
+        return;
+    }
+
     // 点击模态框外部关闭
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
@@ -423,7 +515,7 @@ function showPotionModal(card) {
     modal.classList.add('active');
     
     // 模态框动画
-    anime({
+    safeAnime({
         targets: '.modal-content',
         scale: [0.8, 1],
         opacity: [0, 1],
@@ -435,7 +527,7 @@ function showPotionModal(card) {
 function closeModal() {
     const modal = document.getElementById('potion-modal');
     
-    anime({
+    safeAnime({
         targets: '.modal-content',
         scale: [1, 0.8],
         opacity: [1, 0],
@@ -478,7 +570,7 @@ function selectMaterial(element, material, name) {
     updateSelectedMaterials();
     
     // 添加选择动画
-    anime({
+    safeAnime({
         targets: element,
         scale: [1, 1.2, 1],
         duration: 300,
@@ -488,7 +580,13 @@ function selectMaterial(element, material, name) {
 
 function updateSelectedMaterials() {
     const container = document.getElementById('selected-materials');
-    
+
+    // 检查元素是否存在（避免在test-error-system.html等页面报错）
+    if (!container) {
+        console.log('ℹ️ 已选材料容器不存在，跳过更新');
+        return;
+    }
+
     if (selectedMaterials.length === 0) {
         container.innerHTML = '<div class="text-gray-500">点击材料添加到坩埚</div>';
         return;
@@ -525,7 +623,7 @@ function brewPotion() {
     }
     
     // 坩埚动画
-    anime({
+    safeAnime({
         targets: '#cauldron',
         rotate: [0, 360],
         scale: [1, 1.3, 1],
@@ -536,17 +634,19 @@ function brewPotion() {
     // 模拟制作结果
     setTimeout(() => {
         const result = getBrewingResult(selectedMaterials);
-        document.getElementById('brewing-result').innerHTML = result;
-        
+        const brewingResultElement = document.getElementById('brewing-result');
+        if (brewingResultElement) brewingResultElement.innerHTML = result;
+
         // 清空选择
         selectedMaterials = [];
         updateSelectedMaterials();
-        
+
         // 重置材料槽
-        document.querySelectorAll('.material-slot').forEach(slot => {
+        const materialSlots = document.querySelectorAll('.material-slot');
+        materialSlots.forEach(slot => {
             slot.classList.remove('filled');
         });
-        
+
         showNotification('魔药制作完成！', 'success');
     }, 1500);
 }
@@ -653,3 +753,160 @@ window.selectMaterial = selectMaterial;
 window.removeMaterial = removeMaterial;
 window.brewPotion = brewPotion;
 window.closeModal = closeModal;
+
+/**
+ * 老王错误汇报系统 - 专门收集SB报错
+ */
+
+// 显示错误报告
+window.showErrorReport = function() {
+    if (errorManager) {
+        errorManager.showErrorReport();
+    } else {
+        console.error('❌ 错误管理器未初始化');
+    }
+};
+
+// 导出错误管理器供全局使用
+window.getErrorManager = function() {
+    return errorManager;
+};
+
+// 手动添加错误（供调试使用）
+window.reportError = function(message, severity = 'medium') {
+    if (errorManager) {
+        errorManager.addError({
+            type: 'manual',
+            message: message,
+            severity: severity,
+            timestamp: Date.now()
+        });
+        console.log(`✅ 手动错误已记录: ${message}`);
+    } else {
+        console.error('❌ 错误管理器未初始化，无法记录错误:', message);
+    }
+};
+
+// 获取错误统计
+window.getErrorStats = function() {
+    if (errorManager) {
+        return errorManager.getErrorStats();
+    }
+    return null;
+};
+
+// 清空错误日志
+window.clearErrorLog = function() {
+    if (errorManager) {
+        errorManager.clearErrors();
+        console.log('✅ 错误日志已清空');
+    }
+};
+
+// 导出错误报告
+window.exportErrorReport = function() {
+    if (errorManager) {
+        errorManager.exportReport();
+    }
+};
+
+/**
+ * 添加错误汇报按钮到页面
+ */
+function addErrorReportButton() {
+    // 创建错误汇报按钮
+    const errorButton = document.createElement('button');
+    errorButton.id = 'error-report-button';
+    errorButton.innerHTML = '🐛 报错';
+    errorButton.title = '点击查看错误报告 (快捷键: Ctrl+Shift+E)';
+    errorButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 14px;
+        cursor: pointer;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        font-family: Arial, sans-serif;
+    `;
+
+    // 添加悬停效果
+    errorButton.addEventListener('mouseenter', () => {
+        errorButton.style.transform = 'scale(1.1)';
+        errorButton.style.background = '#c0392b';
+    });
+
+    errorButton.addEventListener('mouseleave', () => {
+        errorButton.style.transform = 'scale(1)';
+        errorButton.style.background = '#e74c3c';
+    });
+
+    // 点击事件
+    errorButton.addEventListener('click', () => {
+        showErrorReport();
+    });
+
+    document.body.appendChild(errorButton);
+    console.log('✅ 错误汇报按钮已添加');
+}
+
+/**
+ * 添加键盘快捷键支持
+ */
+function addErrorReportShortcut() {
+    document.addEventListener('keydown', (e) => {
+        // 检测Ctrl（Windows/Linux）或Cmd（Mac）
+        const isModifier = e.ctrlKey || e.metaKey;
+
+        // Ctrl/Cmd+Shift+E 显示错误报告（Mac和Windows通用）
+        if (isModifier && e.shiftKey && e.key === 'E') {
+            e.preventDefault();
+            showErrorReport();
+        }
+
+        // Ctrl/Cmd+Shift+C 清空错误日志（Mac和Windows通用）
+        if (isModifier && e.shiftKey && e.key === 'C') {
+            e.preventDefault();
+            if (confirm('确定要清空所有错误日志吗？')) {
+                clearErrorLog();
+            }
+        }
+    });
+
+    console.log('✅ 错误汇报快捷键已添加 (Ctrl/Cmd+Shift+E 查看报告, Ctrl/Cmd+Shift+C 清空日志)');
+}
+
+/**
+ * 页面加载完成后添加错误汇报功能
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // 延迟添加按钮，确保页面完全加载
+    setTimeout(() => {
+        try {
+            addErrorReportButton();
+            addErrorReportShortcut();
+            console.log('✅ 老王错误汇报系统已完全就绪！');
+        } catch (error) {
+            console.error('❌ 添加错误汇报按钮失败:', error);
+        }
+    }, 1000);
+});
+
+// 显示欢迎信息和快捷键提示
+setTimeout(() => {
+    console.log('');
+    console.log('🍺 魔药酒馆 - 老王错误汇报系统');
+    console.log('=====================================');
+    console.log('🐛 点击右下角的"报错"按钮查看错误报告');
+    console.log('⌨️  快捷键:');
+    console.log('   Ctrl+Shift+E - 显示错误报告');
+    console.log('   Ctrl+Shift+C - 清空错误日志');
+    console.log('=====================================');
+    console.log('');
+}, 2000);
