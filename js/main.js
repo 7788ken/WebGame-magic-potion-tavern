@@ -33,6 +33,34 @@ const gameConfig = {
 let game;
 
 /**
+ * 获取当前激活场景
+ */
+function getActiveScene() {
+    if (!game || !game.scene) {
+        return null;
+    }
+
+    const activeScenes = game.scene.getScenes(true);
+    if (activeScenes && activeScenes.length > 0) {
+        return activeScenes[activeScenes.length - 1];
+    }
+
+    return null;
+}
+
+/**
+ * 获取当前激活场景的 key
+ */
+function getActiveSceneKey() {
+    const activeScene = getActiveScene();
+    if (!activeScene || !activeScene.scene) {
+        return null;
+    }
+
+    return activeScene.scene.key || null;
+}
+
+/**
  * 游戏初始化函数
  */
 function initializeGame() {
@@ -102,25 +130,39 @@ function setupGameEventListeners() {
 
     // 窗口失焦事件
     window.addEventListener('blur', () => {
-        if (game && game.scene.isPaused(game.scene.scenes[0])) {
+        if (!game) {
             return;
         }
-        // 自动暂停游戏
-        if (game && game.scene.scenes.length > 0) {
-            const currentScene = game.scene.getScene(game.scene.scenes[0].scene.key);
-            if (currentScene) {
-                currentScene.scene.pause();
-            }
+
+        const activeScene = getActiveScene();
+        const activeSceneKey = getActiveSceneKey();
+
+        if (!activeScene || !activeSceneKey) {
+            return;
         }
+
+        if (game.scene.isPaused(activeSceneKey)) {
+            return;
+        }
+
+        activeScene.scene.pause(activeSceneKey);
     });
 
     // 窗口聚焦事件
     window.addEventListener('focus', () => {
-        if (game && game.scene.scenes.length > 0) {
-            const currentScene = game.scene.getScene(game.scene.scenes[0].scene.key);
-            if (currentScene) {
-                currentScene.scene.resume();
-            }
+        if (!game) {
+            return;
+        }
+
+        const activeScene = getActiveScene();
+        const activeSceneKey = getActiveSceneKey();
+
+        if (!activeScene || !activeSceneKey) {
+            return;
+        }
+
+        if (game.scene.isPaused(activeSceneKey)) {
+            activeScene.scene.resume(activeSceneKey);
         }
     });
 
@@ -376,7 +418,7 @@ window.GameState = {
      */
     getCurrentScene: function() {
         if (!game || !game.scene.scenes.length) return null;
-        return game.scene.getScene(game.scene.scenes[0].scene.key);
+        return getActiveScene();
     },
 
     /**
@@ -399,7 +441,16 @@ window.GameState = {
      */
     pauseGame: function() {
         if (!game) return;
-        game.scene.pause(game.scene.scenes[0].scene.key);
+        const activeScene = getActiveScene();
+        const activeSceneKey = getActiveSceneKey();
+
+        if (!activeScene || !activeSceneKey) {
+            return;
+        }
+
+        if (!game.scene.isPaused(activeSceneKey)) {
+            activeScene.scene.pause(activeSceneKey);
+        }
     },
 
     /**
@@ -407,7 +458,16 @@ window.GameState = {
      */
     resumeGame: function() {
         if (!game) return;
-        game.scene.resume(game.scene.scenes[0].scene.key);
+        const activeScene = getActiveScene();
+        const activeSceneKey = getActiveSceneKey();
+
+        if (!activeScene || !activeSceneKey) {
+            return;
+        }
+
+        if (game.scene.isPaused(activeSceneKey)) {
+            activeScene.scene.resume(activeSceneKey);
+        }
     },
 
     /**

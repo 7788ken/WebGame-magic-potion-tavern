@@ -298,7 +298,7 @@ class PreloadScene extends Phaser.Scene {
      */
     loadAudio() {
         // 背景音乐 - 使用WAV格式
-        this.load.audio('bgm_main', 'assets/audio/main_theme.wav');
+        this.load.audio('bgm_main', 'assets/audio/bgm/main-bgm.mp3');
         this.load.audio('bgm_tavern', 'assets/audio/tavern_theme.wav');
         this.load.audio('bgm_brewing', 'assets/audio/brewing_theme.wav');
         this.load.audio('bgm_battle', 'assets/audio/battle_theme.wav');

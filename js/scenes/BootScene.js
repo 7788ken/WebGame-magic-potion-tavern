@@ -220,7 +220,7 @@ class BootScene extends Phaser.Scene {
         this.load.image('particle_magic', 'assets/particles/magic.png.svg');
 
         // 加载音频资源
-        this.load.audio('bgm_main', 'assets/audio/main_theme.wav');
+        this.load.audio('bgm_main', 'assets/audio/bgm/main-bgm.mp3');
         this.load.audio('bgm_tavern', 'assets/audio/tavern_theme.wav');
         this.load.audio('bgm_battle', 'assets/audio/battle_theme.wav');
         this.load.audio('sfx_click', 'assets/audio/click.wav');

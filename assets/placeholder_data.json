@@ -1,32 +1,83 @@
 {
+  "metadata": {
+    "generatedBy": "generatePixelArtAssets.js",
+    "palette": "tavern-night",
+    "style": "pixel-vertical",
+    "lastUpdated": "2024-05-28"
+  },
   "images": {
     "logo": "assets/images/logo.png.svg",
     "background": "assets/images/background.jpg.svg",
-    "tavern_background": "assets/images/tavern_background.jpg.svg"
+    "menu": "assets/images/menu_bg.jpg.svg",
+    "tavern": "assets/images/tavern_background.jpg.svg",
+    "battle": "assets/images/battle_bg.jpg.svg",
+    "brewing": "assets/images/brewing_bg.jpg.svg",
+    "shop": "assets/images/shop_bg.jpg.svg"
   },
   "ui": {
     "button_normal": "assets/ui/button_normal.png.svg",
     "button_hover": "assets/ui/button_hover.png.svg",
-    "button_pressed": "assets/ui/button_pressed.png.svg"
+    "button_pressed": "assets/ui/button_pressed.png.svg",
+    "button_disabled": "assets/ui/button_disabled.png.svg",
+    "panel": "assets/ui/panel.png.svg",
+    "window": "assets/ui/window.png.svg",
+    "progress_bar": "assets/ui/progress_bar.png.svg",
+    "slider": "assets/ui/slider.png.svg"
   },
   "icons": {
+    "attack": "assets/icons/attack.png.svg",
+    "defense": "assets/icons/defense.png.svg",
+    "experience": "assets/icons/experience.png.svg",
     "gold": "assets/icons/gold.png.svg",
+    "health": "assets/icons/health.png.svg",
+    "inventory": "assets/icons/inventory.png.svg",
+    "level": "assets/icons/level.png.svg",
+    "mana": "assets/icons/mana.png.svg",
     "materials": "assets/icons/materials.png.svg",
-    "reputation": "assets/icons/reputation.png.svg"
+    "quest": "assets/icons/quest.png.svg",
+    "reputation": "assets/icons/reputation.png.svg",
+    "settings": "assets/icons/settings.png.svg",
+    "speed": "assets/icons/speed.png.svg"
   },
   "materials": {
     "moon_grass": "assets/materials/moon_grass.png.svg",
     "fire_grass": "assets/materials/fire_grass.png.svg",
-    "dew_drop": "assets/materials/dew_drop.png.svg"
+    "dew_drop": "assets/materials/dew_drop.png.svg",
+    "earth_root": "assets/materials/earth_root.png.svg",
+    "wind_leaf": "assets/materials/wind_leaf.png.svg",
+    "light_shard": "assets/materials/light_shard.png.svg",
+    "dark_essence": "assets/materials/dark_essence.png.svg",
+    "ice_crystal": "assets/materials/ice_crystal.png.svg",
+    "thunder_stone": "assets/materials/thunder_stone.png.svg"
   },
   "particles": {
     "spark": "assets/particles/spark.png.svg",
     "glow": "assets/particles/glow.png.svg",
-    "magic": "assets/particles/magic.png.svg"
+    "magic": "assets/particles/magic.png.svg",
+    "fire": "assets/particles/fire.png.svg",
+    "ice": "assets/particles/ice.png.svg",
+    "heal": "assets/particles/heal.png.svg",
+    "lightning": "assets/particles/lightning.png.svg",
+    "poison": "assets/particles/poison.png.svg"
   },
   "sprites": {
     "character_player": "assets/sprites/character_player.png.svg",
     "character_npc": "assets/sprites/character_npc.png.svg",
-    "character_enemy": "assets/sprites/character_enemy.png.svg"
+    "character_enemy": "assets/sprites/character_enemy.png.svg",
+    "enemy_boss": "assets/sprites/enemy_boss.png.svg",
+    "enemy_minion": "assets/sprites/enemy_minion.png.svg",
+    "npc_alchemist": "assets/sprites/npc_alchemist.png.svg",
+    "npc_blacksmith": "assets/sprites/npc_blacksmith.png.svg",
+    "npc_merchant": "assets/sprites/npc_merchant.png.svg",
+    "buff_attack": "assets/sprites/buff_attack.png.svg",
+    "buff_defense": "assets/sprites/buff_defense.png.svg",
+    "debuff_poison": "assets/sprites/debuff_poison.png.svg",
+    "debuff_stun": "assets/sprites/debuff_stun.png.svg",
+    "card_frame": "assets/sprites/card_frame.png.svg",
+    "card_back": "assets/sprites/card_back.png.svg",
+    "cards": "assets/sprites/cards.png.svg",
+    "effects": "assets/sprites/effects.png.svg",
+    "particles": "assets/sprites/particles.png.svg",
+    "potions": "assets/sprites/potions.png.svg"
   }
 }

@@ -166,10 +166,16 @@
 2. 定义所需材料和制作参数
 3. 更新配方发现逻辑
 
+### 像素素材生成
+- 运行 `node generatePixelArtAssets.js` 批量生成/覆盖像素风界面与角色素材
+- 所有 SVG 使用竖屏 8x 缩放像素网格，调色板集中于 `generatePixelArtAssets.js`
+- 生成结果映射保存在 `assets/placeholder_data.json`，方便快速定位资源类别
+- 需要PNG时，搭配 `convert_images.js` 用 `sharp` 将 SVG 转换为位图
+
 ## 🎵 音效和音乐
 
 ### 背景音乐
-- 主菜单主题
+- 主菜单主题（`assets/audio/bgm/main-bgm.mp3`）
 - 酒馆背景音乐
 - 魔药制作音乐
 - 对战音乐
