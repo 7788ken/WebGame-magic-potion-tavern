@@ -894,7 +894,7 @@ class BrewingScene extends Phaser.Scene {
         const dropResult = this.checkDropResult(pointer);
 
         if (dropResult.success) {
-            this.handleSuccessfulDrop(draggedObj, dropResult);
+            this.handleSuccessfulDrop(draggedObj, dropResult, pointer);
         } else {
             this.handleFailedDrop(draggedObj);
         }
@@ -918,7 +918,7 @@ class BrewingScene extends Phaser.Scene {
     /**
      * 处理成功放置
      */
-    handleSuccessfulDrop(draggedObj, result) {
+    handleSuccessfulDrop(draggedObj, result, pointer) {
         if (draggedObj.type === 'material') {
             this.addMaterialToRecipe(draggedObj.data);
         }
@@ -927,7 +927,9 @@ class BrewingScene extends Phaser.Scene {
         GameConfig.audio.playSafe(this, 'sfx_success', { volume: 0.4 });
 
         // 显示成功效果
-        this.showDropSuccessEffect(pointer.x, pointer.y);
+        const dropX = pointer ? pointer.x : this.cameras.main.width / 2;
+        const dropY = pointer ? pointer.y : this.cameras.main.height / 2;
+        this.showDropSuccessEffect(dropX, dropY);
     }
 
     /**
@@ -973,7 +975,7 @@ class BrewingScene extends Phaser.Scene {
 
         if (this.selectedMaterials.length === 0) return;
 
-        const { width } = this.cameras.main;
+        const { width, height } = this.cameras.main;
         const x = width / 2;
         const y = height / 2 + 80;
 

@@ -332,6 +332,52 @@ class EventManager {
         return false;
     }
 
+    recordEventResult(eventId, success, choice) {
+        const choiceSnapshot = choice ? {
+            id: choice.id || null,
+            text: choice.text || '',
+            rewards: choice.rewards || null,
+            penalties: choice.penalties || null
+        } : null;
+
+        const activeEvent = this.activeEvents.find(event => event.id === eventId);
+        if (activeEvent) {
+            activeEvent.resultDetails = {
+                success,
+                choice: choiceSnapshot,
+                timestamp: Date.now()
+            };
+
+            this.completeEvent(eventId, success);
+            return;
+        }
+
+        const historyEvent = this.eventHistory.find(event => event.id === eventId);
+        if (historyEvent) {
+            historyEvent.resultDetails = {
+                success,
+                choice: choiceSnapshot,
+                timestamp: Date.now()
+            };
+            historyEvent.success = success;
+            historyEvent.completed = true;
+            historyEvent.completedTime = historyEvent.completedTime || Date.now();
+            return;
+        }
+
+        this.eventHistory.push({
+            id: eventId,
+            success,
+            completed: true,
+            completedTime: Date.now(),
+            resultDetails: {
+                success,
+                choice: choiceSnapshot,
+                timestamp: Date.now()
+            }
+        });
+    }
+
     /**
      * 给予事件奖励
      */

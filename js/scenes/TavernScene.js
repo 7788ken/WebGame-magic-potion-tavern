@@ -16,8 +16,6 @@ class TavernScene extends Phaser.Scene {
         this.uiElements = {};
         this.customerSprites = [];
         this.staffSprites = [];
-        this.potionDisplays = [];
-
         // 管理器
         this.customerManager = null;
         this.staffManager = null;
@@ -54,20 +52,11 @@ class TavernScene extends Phaser.Scene {
         // 创建UI界面
         this.createUI();
 
-        // 创建酒馆布局
-        this.createTavernLayout();
+        this.initializeSceneManagers();
 
-        // 创建客人区域
         this.createCustomerArea();
 
-        // 创建制作区域
-        this.createBrewingArea();
-
-        // 创建员工区域
-        this.createStaffArea();
-
-        // 创建库存展示
-        this.createInventoryDisplay();
+        this.updateAllPanels();
 
         // 设置游戏循环
         this.setupGameLoop();
@@ -135,112 +124,410 @@ class TavernScene extends Phaser.Scene {
      * 创建UI界面
      */
     createUI() {
-        const { width, height } = this.cameras.main;
-
-        // 顶部信息栏
+        this.initializeLayoutMetrics();
         this.createTopBar();
-
-        // 左侧信息面板
-        this.createLeftPanel();
-
-        // 右侧操作面板
-        this.createRightPanel();
-
-        // 底部快捷栏
-        this.createBottomBar();
-
-        // 时间显示
         this.createTimeDisplay();
-
-        // 通知系统
+        this.createTabViews();
+        this.createBottomBar();
         this.createNotificationSystem();
+        this.switchTab('tavern');
     }
 
-    /**
-     * 创建顶部信息栏
-     */
+    initializeLayoutMetrics() {
+        const { width, height } = this.cameras.main;
+
+        const topBarHeight = Math.max(72, Math.round(height * 0.12));
+        const bottomBarHeight = Math.max(88, Math.round(height * 0.13));
+        const bottomBarY = height - bottomBarHeight / 2 - 12;
+
+        const contentTop = topBarHeight + 40;
+        const contentBottom = bottomBarY - bottomBarHeight / 2 - 32;
+        const contentHeight = Math.max(320, contentBottom - contentTop);
+
+        const statsRatio = 0.28;
+        const operationsRatio = 0.32;
+        const inventoryRatio = 1 - statsRatio - operationsRatio;
+
+        let statsPanelHeight = Math.max(160, Math.round(contentHeight * statsRatio));
+        let actionPanelHeight = Math.max(180, Math.round(contentHeight * operationsRatio));
+        let inventoryPanelHeight = Math.max(200, Math.round(contentHeight * inventoryRatio));
+
+        const totalPanelsHeight = statsPanelHeight + actionPanelHeight + inventoryPanelHeight + 48;
+        if (totalPanelsHeight > contentHeight) {
+            const scale = contentHeight / totalPanelsHeight;
+            statsPanelHeight = Math.round(statsPanelHeight * scale);
+            actionPanelHeight = Math.round(actionPanelHeight * scale);
+            inventoryPanelHeight = Math.round(inventoryPanelHeight * scale);
+        }
+
+        let statsPanelY = contentTop + statsPanelHeight / 2;
+        let actionPanelY = statsPanelY + statsPanelHeight / 2 + actionPanelHeight / 2 + 16;
+        let inventoryPanelY = actionPanelY + actionPanelHeight / 2 + inventoryPanelHeight / 2 + 16;
+
+        const bottomLimit = contentBottom;
+        const panelBottom = inventoryPanelY + inventoryPanelHeight / 2;
+        if (panelBottom > bottomLimit) {
+            const offset = panelBottom - bottomLimit;
+            statsPanelY -= offset;
+            actionPanelY -= offset;
+            inventoryPanelY -= offset;
+        }
+
+        const panelWidth = Phaser.Math.Clamp(Math.round(width * 0.9), 320, 580);
+        const actionButtonWidth = Math.min(panelWidth * 0.85, width * 0.76);
+
+        this.layout = {
+            width,
+            height,
+            centerX: width / 2,
+            centerY: height / 2,
+            topBarHeight,
+            bottomBarHeight,
+            bottomBarY,
+            panelWidth,
+            actionButtonWidth,
+            statsPanelHeight,
+            statsPanelY,
+            actionPanelHeight,
+            actionPanelY,
+            inventoryPanelHeight,
+            inventoryPanelY
+        };
+    }
+
+    initializeSceneManagers() {
+        if (typeof customerManager !== 'undefined') {
+            this.customerManager = customerManager;
+        } else if (typeof CustomerManager !== 'undefined') {
+            this.customerManager = new CustomerManager();
+            this.customerManager.initialize();
+        }
+
+        if (typeof staffManager !== 'undefined') {
+            this.staffManager = staffManager;
+        } else if (typeof StaffManager !== 'undefined') {
+            this.staffManager = new StaffManager();
+            this.staffManager.initialize();
+        }
+
+        if (typeof potionManager !== 'undefined') {
+            this.potionManager = potionManager;
+        } else if (typeof PotionManager !== 'undefined') {
+            this.potionManager = new PotionManager();
+        }
+    }
+
+    updateAllPanels() {
+        this.updateUI();
+        this.updateStrategyView();
+        this.updateProcurementView();
+        this.updatePlayerView();
+        this.updateBattleView();
+    }
+
     createTopBar() {
         const { width } = this.cameras.main;
+        const barHeight = this.layout.topBarHeight;
 
-        // 背景条
         const topBar = this.add.graphics();
-        topBar.fillStyle(0x2D1B69, 0.9);
-        topBar.fillRect(0, 0, width, 60);
-        topBar.lineStyle(2, 0xFFD700, 0.8);
-        topBar.strokeRect(0, 0, width, 60);
+        topBar.fillGradientStyle(
+            0x24164f, 0x2f1f63,
+            0x1a1036, 0x231648,
+            0.95
+        );
+        topBar.fillRect(0, 0, width, barHeight);
+        topBar.setDepth(4);
 
-        // 标题
+        const topHighlight = this.add.graphics();
+        topHighlight.fillGradientStyle(0xffffff, 0xffffff, 0xffe8ba, 0xffe8ba, 0.15);
+        topHighlight.fillRect(0, 0, width, barHeight * 0.35);
+        topHighlight.setDepth(4.1);
+
+        const frame = this.add.image(width / 2, barHeight / 2, 'ui_window');
+        frame.setDisplaySize(width * 0.94, barHeight);
+        frame.setAlpha(0.92);
+        frame.setDepth(4.5);
+
         const titleStyle = {
             fontSize: '24px',
             fontFamily: 'ZCOOL KuaiLe',
             color: '#FFD700'
         };
 
-        this.add.text(20, 30, '魔药酒馆', titleStyle)
+        const title = this.add.text(40, barHeight / 2, '魔药酒馆', titleStyle)
             .setOrigin(0, 0.5);
+        title.setDepth(6);
 
-        // 日期时间
-        const timeStyle = {
-            fontSize: '16px',
-            fontFamily: 'Noto Sans SC',
-            color: '#FFF8DC'
-        };
+        this.createResourceDisplay();
 
-        this.uiElements.timeText = this.add.text(width / 2, 30, '', timeStyle)
-            .setOrigin(0.5, 0.5);
-
-        // 资源显示
-        this.createResourceDisplay(20, 80);
-    }
-
-    /**
-     * 创建资源显示
-     */
-    createResourceDisplay(x, y) {
-        const resources = [
-            { key: 'gold', icon: '💰', value: gameState.player.gold },
-            { key: 'reputation', icon: '⭐', value: Math.floor(gameState.player.reputation) },
-            { key: 'materials', icon: '🌿', value: this.getTotalMaterials() }
+        const quickActions = [
+            { key: 'tavern', texture: 'icon_bell', handler: () => this.switchTab('tavern'), tooltip: '酒馆总览' },
+            { key: 'settings', texture: 'icon_palette', handler: () => this.showGameMenu(), tooltip: '设置菜单' },
+            { key: 'battle', texture: 'icon_battle', handler: () => this.switchTab('battle'), tooltip: '参加战斗' }
         ];
 
-        resources.forEach((resource, index) => {
-            const xPos = x + index * 150;
+        quickActions.forEach((item, index) => {
+            const icon = this.add.image(width - 40 - index * 44, barHeight / 2, item.texture);
+            icon.setDisplaySize(28, 28);
+            icon.setInteractive({ useHandCursor: true });
+            icon.setAlpha(0.88);
+            icon.setDepth(6);
 
-            // 图标
-            this.add.text(xPos, y, resource.icon, {
-                fontSize: '20px'
-            }).setOrigin(0, 0.5);
+            icon.on('pointerover', () => {
+                icon.setAlpha(1);
+                this.showTooltip(item.tooltip, icon.x, icon.y - 28);
+            });
 
-            // 数值
-            this.uiElements[resource.key + 'Text'] = this.add.text(xPos + 25, y,
-                GameUtils.formatGold(resource.value), {
-                fontSize: '18px',
-                fontFamily: 'Noto Sans SC',
-                color: '#FFD700'
-            }).setOrigin(0, 0.5);
+            icon.on('pointerout', () => {
+                icon.setAlpha(0.88);
+                this.hideTooltip();
+            });
+
+            icon.on('pointerdown', () => {
+                GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.4 });
+                item.handler();
+                this.hideTooltip();
+            });
         });
     }
 
-    /**
-     * 创建左侧信息面板
-     */
-    createLeftPanel() {
-        const panel = this.add.graphics();
-        panel.fillStyle(0x2D1B69, 0.8);
-        panel.fillRoundedRect(20, 120, 280, 400, 10);
-        panel.lineStyle(2, 0xFFD700, 0.8);
-        panel.strokeRoundedRect(20, 120, 280, 400, 10);
+    createResourceDisplay() {
+        const { width } = this.cameras.main;
+        const barHeight = this.layout.topBarHeight;
 
-        // 面板标题
-        const titleStyle = {
+        const resources = [
+            { key: 'gold', texture: 'icon_gold', value: gameState.player.gold, formatter: GameUtils.formatGold },
+            { key: 'reputation', texture: 'icon_reputation', value: Math.floor(gameState.player.reputation) },
+            { key: 'materials', texture: 'icon_materials', value: this.getTotalMaterials() }
+        ];
+
+        const spacing = Math.min(220, (width * 0.8) / resources.length);
+        const startX = width / 2 - ((resources.length - 1) * spacing) / 2;
+        const y = barHeight / 2;
+
+        this.resourceFormatters = this.resourceFormatters || {};
+
+        resources.forEach((resource, index) => {
+            const xPos = startX + index * spacing;
+
+            const icon = this.add.image(xPos - 46, y, resource.texture);
+            icon.setOrigin(0, 0.5);
+            icon.setDisplaySize(26, 26);
+            icon.setAlpha(0.92);
+            icon.setDepth(6);
+
+            const formatter = resource.formatter || ((value) => `${value}`);
+            const valueText = this.add.text(xPos - 10, y, formatter(resource.value), {
+                fontSize: '18px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFE8A3'
+            }).setOrigin(0, 0.5);
+            valueText.setDepth(6);
+
+            this.uiElements[resource.key + 'Text'] = valueText;
+            this.resourceFormatters[resource.key] = formatter;
+        });
+    }
+
+    createTabViews() {
+        this.tabViews = {};
+        this.tabData = {};
+
+        const tavernView = this.add.container(0, 0);
+        tavernView.setDepth(5);
+        tavernView.setVisible(false);
+        this.tabViews.tavern = tavernView;
+
+        tavernView.add(this.buildStatsPanel());
+        tavernView.add(this.buildOperationsPanel());
+        tavernView.add(this.buildInventoryPanel());
+
+        const battleView = this.createBattleTab();
+        const strategyView = this.createStrategyTab();
+        const procurementView = this.createProcurementTab();
+        const playerView = this.createPlayerTab();
+
+        this.tabViews.battle = battleView;
+        this.tabViews.strategy = strategyView;
+        this.tabViews.procurement = procurementView;
+        this.tabViews.player = playerView;
+
+        Object.values(this.tabViews).forEach(view => {
+            if (view) {
+                view.setVisible(false);
+            }
+        });
+    }
+
+    createBottomBar() {
+        const { width } = this.cameras.main;
+        const barHeight = this.layout.bottomBarHeight;
+
+        const container = this.add.container(width / 2, this.layout.bottomBarY);
+        container.setDepth(6);
+
+        const frame = this.add.image(0, 0, 'ui_window');
+        frame.setDisplaySize(width * 0.94, barHeight);
+        frame.setAlpha(0.92);
+        container.add(frame);
+
+        const tabs = [
+            { key: 'tavern', label: '酒馆', icon: 'icon_gold' },
+            { key: 'battle', label: '战斗', icon: 'icon_battle' },
+            { key: 'strategy', label: '策略', icon: 'icon_palette' },
+            { key: 'procurement', label: '采购', icon: 'icon_materials' },
+            { key: 'player', label: '玩家', icon: 'icon_reputation' }
+        ];
+
+        this.tabButtons = {};
+        const tabWidth = frame.displayWidth / tabs.length;
+
+        tabs.forEach((tab, index) => {
+            const button = this.createTabBarButton(tab, tabWidth, barHeight);
+            button.container.x = -frame.displayWidth / 2 + tabWidth * index + tabWidth / 2;
+            container.add(button.container);
+            this.tabButtons[tab.key] = button;
+        });
+
+        this.uiElements.tabBar = container;
+    }
+
+    createTabBarButton(tab, tabWidth, barHeight) {
+        const container = this.add.container(0, 0);
+        container.setSize(tabWidth - 12, barHeight - 16);
+
+        const bg = this.add.image(0, 0, 'ui_button');
+        bg.setDisplaySize(tabWidth - 16, barHeight - 18);
+        container.add(bg);
+
+        const icon = this.add.image(-tabWidth / 4, -2, tab.icon);
+        icon.setDisplaySize(22, 22);
+        container.add(icon);
+
+        const label = this.add.text(0, barHeight * 0.08, tab.label, {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#EDE3FF'
+        }).setOrigin(0.5, 0);
+        container.add(label);
+
+        container.setInteractive(new Phaser.Geom.Rectangle(-tabWidth / 2, -barHeight / 2, tabWidth, barHeight), Phaser.Geom.Rectangle.Contains);
+        container.on('pointerdown', () => {
+            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.4 });
+            this.switchTab(tab.key);
+        });
+
+        return { container, bg, icon, label };
+    }
+
+    createPanelButton(label, onClick) {
+        const container = this.add.container(0, 0);
+
+        const width = Math.min(this.layout.actionButtonWidth, this.layout.panelWidth - 80);
+        const bg = this.add.image(0, 0, 'ui_button');
+        bg.setDisplaySize(width, 48);
+        container.add(bg);
+
+        const text = this.add.text(0, 0, label, {
+            fontSize: '16px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFF8DC'
+        }).setOrigin(0.5);
+        container.add(text);
+
+        container.setSize(width, 48);
+        container.setInteractive(new Phaser.Geom.Rectangle(-width / 2, -24, width, 48), Phaser.Geom.Rectangle.Contains);
+
+        container.on('pointerover', () => {
+            bg.setTexture('ui_button_hover');
+        });
+
+        container.on('pointerout', () => {
+            bg.setTexture('ui_button');
+        });
+
+        container.on('pointerdown', () => {
+            bg.setTexture('ui_button_pressed');
+        });
+
+        container.on('pointerup', () => {
+            bg.setTexture('ui_button_hover');
+            if (typeof onClick === 'function') {
+                onClick();
+            }
+        });
+
+        return container;
+    }
+
+    setTabButtonState(tabKey, active) {
+        const button = this.tabButtons && this.tabButtons[tabKey];
+        if (!button) return;
+
+        button.bg.setTexture(active ? 'ui_button_pressed' : 'ui_button');
+        button.icon.setAlpha(active ? 1 : 0.85);
+        button.label.setColor(active ? '#FFFFFF' : '#EDE3FF');
+        button.container.setDepth(active ? 7 : 6);
+    }
+
+    switchTab(tabKey) {
+        if (!this.tabViews || !this.tabViews[tabKey]) {
+            return;
+        }
+
+        this.activeTab = tabKey;
+
+        Object.entries(this.tabViews).forEach(([key, view]) => {
+            if (view) {
+                view.setVisible(key === tabKey);
+            }
+        });
+
+        Object.keys(this.tabButtons || {}).forEach(key => {
+            this.setTabButtonState(key, key === tabKey);
+        });
+
+        this.updateTabContent(tabKey);
+    }
+
+    updateTabContent(tabKey) {
+        switch (tabKey) {
+            case 'tavern':
+                this.updateUI();
+                break;
+            case 'strategy':
+                this.updateStrategyView();
+                break;
+            case 'procurement':
+                this.updateProcurementView();
+                break;
+            case 'player':
+                this.updatePlayerView();
+                break;
+            case 'battle':
+                this.updateBattleView();
+                break;
+            default:
+                break;
+        }
+    }
+
+    buildStatsPanel() {
+        const { panelWidth, statsPanelHeight, statsPanelY, centerX } = this.layout;
+        const container = this.add.container(centerX, statsPanelY);
+        container.setDepth(6);
+
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, statsPanelHeight);
+        container.add(panel);
+
+        const title = this.add.text(0, -statsPanelHeight / 2 + 32, '今日统计', {
             fontSize: '20px',
             fontFamily: 'Noto Sans SC',
             color: '#FFD700'
-        };
+        }).setOrigin(0.5);
+        container.add(title);
 
-        this.add.text(160, 140, '今日统计', titleStyle).setOrigin(0.5);
-
-        // 统计信息
         const stats = [
             { label: '营业额', value: '0 金币', key: 'revenue' },
             { label: '服务客人', value: '0 位', key: 'customers' },
@@ -248,130 +535,503 @@ class TavernScene extends Phaser.Scene {
             { label: '员工效率', value: '100%', key: 'efficiency' }
         ];
 
-        stats.forEach((stat, index) => {
-            const y = 180 + index * 60;
+        const rowGap = (statsPanelHeight - 100) / stats.length;
 
-            this.add.text(40, y, stat.label, {
+        stats.forEach((stat, index) => {
+            const yOffset = -statsPanelHeight / 2 + 80 + index * rowGap;
+
+            const label = this.add.text(-panelWidth / 2 + 40, yOffset, stat.label, {
                 fontSize: '16px',
                 fontFamily: 'Noto Sans SC',
                 color: '#FFF8DC'
             }).setOrigin(0, 0.5);
+            container.add(label);
 
-            this.uiElements[stat.key + 'Stat'] = this.add.text(260, y, stat.value, {
+            const value = this.add.text(panelWidth / 2 - 40, yOffset, stat.value, {
                 fontSize: '16px',
                 fontFamily: 'Noto Sans SC',
-                color: '#00FF7F'
+                color: '#8BF0A7'
             }).setOrigin(1, 0.5);
+            container.add(value);
+
+            this.uiElements[`${stat.key}Stat`] = value;
         });
+
+        return container;
     }
 
-    /**
-     * 创建右侧操作面板
-     */
-    createRightPanel() {
-        const panel = this.add.graphics();
-        panel.fillStyle(0x2D1B69, 0.8);
-        panel.fillRoundedRect(980, 120, 280, 400, 10);
-        panel.lineStyle(2, 0xFFD700, 0.8);
-        panel.strokeRoundedRect(980, 120, 280, 400, 10);
+    buildOperationsPanel() {
+        const { panelWidth, actionPanelHeight, actionPanelY, centerX } = this.layout;
+        const container = this.add.container(centerX, actionPanelY);
+        container.setDepth(6);
 
-        // 操作按钮
-        const actions = [
-            { text: '制作魔药', action: () => this.openBrewingInterface() },
-            { text: '查看库存', action: () => this.openInventory() },
-            { text: '员工管理', action: () => this.openStaffManagement() },
-            { text: '参与对战', action: () => this.openBattleInterface() },
-            { text: '查看事件', action: () => this.openEventLog() }
-        ];
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, actionPanelHeight);
+        container.add(panel);
 
-        actions.forEach((action, index) => {
-            const y = 160 + index * 70;
-            this.createActionButton(1120, y, action.text, action.action);
+        const title = this.add.text(0, -actionPanelHeight / 2 + 30, '酒馆运营', {
+            fontSize: '20px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFD700'
+        }).setOrigin(0.5);
+        container.add(title);
+
+        const eventLabel = this.add.text(0, -actionPanelHeight / 2 + 70, '事件: 当前无随机事件', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFE8A3'
+        }).setOrigin(0.5, 0);
+        container.add(eventLabel);
+        this.uiElements.eventSummary = eventLabel;
+
+        const staffTitle = this.add.text(-panelWidth / 2 + 40, -actionPanelHeight / 2 + 110, '员工状态', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#C8F8FF'
+        }).setOrigin(0, 0);
+        container.add(staffTitle);
+
+        this.uiElements.staffList = [];
+        const maxRows = 5;
+        const rowGap = (actionPanelHeight - 160) / maxRows;
+
+        for (let i = 0; i < maxRows; i++) {
+            const rowY = -actionPanelHeight / 2 + 150 + i * rowGap;
+            const staffText = this.add.text(-panelWidth / 2 + 40, rowY, '员工空缺', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFF8DC'
+            }).setOrigin(0, 0.5);
+            container.add(staffText);
+            this.uiElements.staffList.push(staffText);
+        }
+
+        const brewingButton = this.createPanelButton('打开制作台', () => {
+            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.4 });
+            this.openBrewingInterface();
         });
+        brewingButton.setPosition(0, actionPanelHeight / 2 - 50);
+        container.add(brewingButton);
+
+        return container;
     }
 
-    /**
-     * 创建操作按钮
-     */
-    createActionButton(x, y, text, onClick) {
-        const button = this.add.container(x, y);
+    buildInventoryPanel() {
+        const { panelWidth, inventoryPanelHeight, inventoryPanelY, centerX } = this.layout;
+        const container = this.add.container(centerX, inventoryPanelY);
+        container.setDepth(6);
 
-        const bg = this.add.graphics();
-        bg.fillStyle(0x3742FA, 0.8);
-        bg.fillRoundedRect(-100, -25, 200, 50, 8);
-        bg.lineStyle(2, 0xFFD700, 0.8);
-        bg.strokeRoundedRect(-100, -25, 200, 50, 8);
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, inventoryPanelHeight);
+        container.add(panel);
 
-        const buttonText = this.add.text(0, 0, text, {
-            fontSize: '16px',
+        const title = this.add.text(0, -inventoryPanelHeight / 2 + 30, '库存展示', {
+            fontSize: '18px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFD700'
+        }).setOrigin(0.5);
+        container.add(title);
+
+        const content = this.add.container(0, -inventoryPanelHeight / 2 + 70);
+        container.add(content);
+
+        this.uiElements.inventoryContainer = container;
+        this.uiElements.inventoryContent = content;
+
+        this.updateInventoryDisplay();
+
+        return container;
+    }
+
+    createBattleTab() {
+        const { panelWidth, statsPanelHeight, centerX, statsPanelY } = this.layout;
+        const container = this.add.container(centerX, statsPanelY);
+        container.setDepth(5);
+        container.setVisible(false);
+
+        const panelHeight = statsPanelHeight + 80;
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, panelHeight);
+        container.add(panel);
+
+        const title = this.add.text(0, -panelHeight / 2 + 32, '战斗匹配', {
+            fontSize: '20px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFD700'
+        }).setOrigin(0.5);
+        container.add(title);
+
+        const description = this.add.text(0, -panelHeight / 2 + 80,
+            '匹配对手进行魔药对决，赢取荣耀与奖励。', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFE8A3',
+            align: 'center',
+            wordWrap: { width: panelWidth - 80 }
+        }).setOrigin(0.5, 0);
+        container.add(description);
+
+        const rankText = this.add.text(0, -panelHeight / 2 + 130, '当前段位: 未定级', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#C8F8FF'
+        }).setOrigin(0.5);
+        container.add(rankText);
+
+        const button = this.add.container(0, panelHeight / 2 - 60);
+        button.setInteractive(new Phaser.Geom.Rectangle(-110, -28, 220, 56), Phaser.Geom.Rectangle.Contains);
+        const btnBg = this.add.image(0, 0, 'ui_button');
+        btnBg.setDisplaySize(220, 56);
+        button.add(btnBg);
+        const btnLabel = this.add.text(0, 0, '开始匹配', {
+            fontSize: '18px',
             fontFamily: 'Noto Sans SC',
             color: '#FFF8DC'
         }).setOrigin(0.5);
+        button.add(btnLabel);
 
-        button.add([bg, buttonText]);
-        button.setInteractive(new Phaser.Geom.Rectangle(-100, -25, 200, 50),
-            Phaser.Geom.Rectangle.Contains);
-
-        // 交互效果
-        button.on('pointerover', () => {
-            this.tweens.add({
-                targets: button,
-                scale: 1.05,
-                duration: 200
-            });
-            bg.clear();
-            bg.fillStyle(0x00FF7F, 0.9);
-            bg.fillRoundedRect(-100, -25, 200, 50, 8);
-            bg.lineStyle(2, 0xFFD700, 1);
-            bg.strokeRoundedRect(-100, -25, 200, 50, 8);
-        });
-
-        button.on('pointerout', () => {
-            this.tweens.add({
-                targets: button,
-                scale: 1,
-                duration: 200
-            });
-            bg.clear();
-            bg.fillStyle(0x3742FA, 0.8);
-            bg.fillRoundedRect(-100, -25, 200, 50, 8);
-            bg.lineStyle(2, 0xFFD700, 0.8);
-            bg.strokeRoundedRect(-100, -25, 200, 50, 8);
-        });
-
+        button.on('pointerover', () => btnBg.setTexture('ui_button_hover'));
+        button.on('pointerout', () => btnBg.setTexture('ui_button'));
         button.on('pointerdown', () => {
-            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.5 });
-            onClick();
+            btnBg.setTexture('ui_button_pressed');
+            GameConfig.audio.playSafe(this, 'sfx_click', { volume: 0.4 });
+            this.openBattleInterface();
         });
+        button.on('pointerup', () => btnBg.setTexture('ui_button_hover'));
+        container.add(button);
 
-        return button;
+        this.uiElements.battleRank = rankText;
+
+        return container;
     }
 
-    /**
-     * 创建底部快捷栏
-     */
-    createBottomBar() {
-        const { width, height } = this.cameras.main;
+    updateBattleView() {
+        if (!this.uiElements.battleRank) return;
+        const battleState = gameState.battle || {};
+        const rank = battleState.rank || battleState.tier || '未定级';
+        const winRate = battleState.winRate ? `${Math.floor(battleState.winRate * 100)}%` : '0%';
+        this.uiElements.battleRank.setText(`当前段位: ${rank} · 胜率 ${winRate}`);
+    }
 
-        // 快捷按钮
-        const shortcuts = [
-            { key: 'B', text: '制作', action: () => this.openBrewingInterface() },
-            { key: 'I', text: '库存', action: () => this.openInventory() },
-            { key: 'S', text: '员工', action: () => this.openStaffManagement() },
-            { key: 'F', text: '对战', action: () => this.openBattleInterface() },
-            { key: 'ESC', text: '菜单', action: () => this.showGameMenu() }
-        ];
+    createStrategyTab() {
+        const { panelWidth, statsPanelHeight, actionPanelHeight, centerX, statsPanelY } = this.layout;
+        const container = this.add.container(centerX, statsPanelY);
+        container.setDepth(5);
+        container.setVisible(false);
 
-        shortcuts.forEach((shortcut, index) => {
-            const x = 50 + index * 100;
-            const y = height - 50;
+        const panelHeight = statsPanelHeight + actionPanelHeight;
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, panelHeight);
+        container.add(panel);
 
-            this.add.text(x, y, `[${shortcut.key}] ${shortcut.text}`, {
+        const title = this.add.text(0, -panelHeight / 2 + 30, '生产策略', {
+            fontSize: '20px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFD700'
+        }).setOrigin(0.5);
+        container.add(title);
+
+        const guidance = this.add.text(0, -panelHeight / 2 + 64,
+            '根据库存与订单制定各类魔药的生产数量。', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFE8A3',
+            align: 'center',
+            wordWrap: { width: panelWidth - 80 }
+        }).setOrigin(0.5, 0);
+        container.add(guidance);
+
+        this.uiElements.strategyRows = [];
+        const recipes = Object.values(PotionRecipes).slice(0, 6);
+        const startY = -panelHeight / 2 + 120;
+        const rowGap = (panelHeight - 160) / recipes.length;
+
+        recipes.forEach((recipe, index) => {
+            const rowY = startY + index * rowGap;
+
+            const rowContainer = this.add.container(0, rowY);
+
+            const nameText = this.add.text(-panelWidth / 2 + 40, 0, recipe.name, {
+                fontSize: '16px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFF8DC'
+            }).setOrigin(0, 0.5);
+            rowContainer.add(nameText);
+
+            const materialsText = this.add.text(0, 0, '', {
+                fontSize: '12px',
+                fontFamily: 'Noto Sans SC',
+                color: '#C8F8FF'
+            }).setOrigin(0.5, 0.5);
+            rowContainer.add(materialsText);
+
+            const quantityText = this.add.text(panelWidth / 2 - 40, 0, '数量: 0', {
                 fontSize: '14px',
                 fontFamily: 'Noto Sans SC',
-                color: '#888888'
-            }).setOrigin(0, 0.5);
+                color: '#8BF0A7'
+            }).setOrigin(1, 0.5);
+            rowContainer.add(quantityText);
+
+            container.add(rowContainer);
+
+            this.uiElements.strategyRows.push({
+                recipeId: recipe.id,
+                materialsText,
+                quantityText
+            });
         });
+
+        return container;
+    }
+
+    updateStrategyView() {
+        if (!this.uiElements.strategyRows) return;
+        const plan = gameState.productionPlan || {};
+
+        this.uiElements.strategyRows.forEach(row => {
+            const recipe = PotionRecipes[row.recipeId];
+            if (!recipe) return;
+
+            const quantity = plan[row.recipeId] || 0;
+            row.quantityText.setText(`数量: ${quantity}`);
+
+            const materialSummary = recipe.materials
+                .map(mat => `${this.formatMaterialLabel(mat.type)} x${mat.amount}`)
+                .join(' · ');
+            row.materialsText.setText(materialSummary);
+        });
+    }
+
+    createProcurementTab() {
+        const { panelWidth, statsPanelHeight, actionPanelHeight, centerX, statsPanelY } = this.layout;
+        const container = this.add.container(centerX, statsPanelY);
+        container.setDepth(5);
+        container.setVisible(false);
+
+        const panelHeight = statsPanelHeight + actionPanelHeight;
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, panelHeight);
+        container.add(panel);
+
+        const title = this.add.text(0, -panelHeight / 2 + 30, '材料采购', {
+            fontSize: '20px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFD700'
+        }).setOrigin(0.5);
+        container.add(title);
+
+        const columnsY = -panelHeight / 2 + 80;
+
+        const materialsTitle = this.add.text(-panelWidth / 2 + 40, columnsY, '库存材料', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#C8F8FF'
+        }).setOrigin(0, 0);
+        container.add(materialsTitle);
+
+        const offersTitle = this.add.text(panelWidth / 2 - 40, columnsY, '随机商品', {
+            fontSize: '14px',
+            fontFamily: 'Noto Sans SC',
+            color: '#C8F8FF'
+        }).setOrigin(1, 0);
+        container.add(offersTitle);
+
+        this.uiElements.procurementMaterials = [];
+        this.uiElements.procurementOffers = [];
+
+        const materialsStartY = columnsY + 28;
+        const rowGap = (panelHeight - 140) / 6;
+
+        for (let i = 0; i < 6; i++) {
+            const y = materialsStartY + i * rowGap;
+
+            const materialText = this.add.text(-panelWidth / 2 + 40, y, '—', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFF8DC'
+            }).setOrigin(0, 0.5);
+            container.add(materialText);
+            this.uiElements.procurementMaterials.push(materialText);
+
+            const offerText = this.add.text(panelWidth / 2 - 40, y, '—', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFD7A3'
+            }).setOrigin(1, 0.5);
+            container.add(offerText);
+            this.uiElements.procurementOffers.push(offerText);
+        }
+
+        this.procurementOffers = this.generateProcurementOffers();
+        this.updateProcurementView();
+
+        return container;
+    }
+
+    generateProcurementOffers() {
+        const materialKeys = Object.keys(AssetManifest.materials || {});
+        if (!materialKeys.length) return [];
+
+        const offers = [];
+        for (let i = 0; i < 6; i++) {
+            const key = Phaser.Utils.Array.GetRandom(materialKeys);
+            const price = 50 + Math.floor(Math.random() * 200);
+            offers.push({ key, price });
+        }
+        return offers;
+    }
+
+    updateProcurementView() {
+        if (!this.uiElements.procurementMaterials || !this.uiElements.procurementOffers) return;
+
+        const materials = gameState.inventory?.materials || {};
+        const materialEntries = Object.entries(materials).slice(0, this.uiElements.procurementMaterials.length);
+
+        this.uiElements.procurementMaterials.forEach((text, index) => {
+            if (materialEntries[index]) {
+                const [key, value] = materialEntries[index];
+                text.setText(`${this.formatMaterialLabel(key)}: ${value}`);
+            } else {
+                text.setText('—');
+            }
+        });
+
+        if (!this.procurementOffers || !this.procurementOffers.length) {
+            this.procurementOffers = this.generateProcurementOffers();
+        }
+
+        this.uiElements.procurementOffers.forEach((text, index) => {
+            if (this.procurementOffers[index]) {
+                const offer = this.procurementOffers[index];
+                text.setText(`${this.formatMaterialLabel(offer.key)}: ${offer.price} 金币`);
+            } else {
+                text.setText('—');
+            }
+        });
+    }
+
+    createPlayerTab() {
+        const { panelWidth, statsPanelHeight, actionPanelHeight, centerX, statsPanelY } = this.layout;
+        const container = this.add.container(centerX, statsPanelY);
+        container.setDepth(5);
+        container.setVisible(false);
+
+        const panelHeight = statsPanelHeight + actionPanelHeight;
+        const panel = this.add.image(0, 0, 'ui_panel');
+        panel.setDisplaySize(panelWidth, panelHeight);
+        container.add(panel);
+
+        const title = this.add.text(0, -panelHeight / 2 + 30, '玩家信息', {
+            fontSize: '20px',
+            fontFamily: 'Noto Sans SC',
+            color: '#FFD700'
+        }).setOrigin(0.5);
+        container.add(title);
+
+        const avatar = this.add.image(-panelWidth / 2 + 100, -panelHeight / 2 + 160, 'character_player');
+        avatar.setDisplaySize(96, 96);
+        container.add(avatar);
+
+        const infoTexts = {
+            name: this.add.text(-panelWidth / 2 + 190, -panelHeight / 2 + 110, '名称: —', {
+                fontSize: '16px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFF8DC'
+            }).setOrigin(0, 0),
+            level: this.add.text(-panelWidth / 2 + 190, -panelHeight / 2 + 140, '等级: —', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#C8F8FF'
+            }).setOrigin(0, 0),
+            reputation: this.add.text(-panelWidth / 2 + 190, -panelHeight / 2 + 170, '声誉: —', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#C8F8FF'
+            }).setOrigin(0, 0),
+            gold: this.add.text(-panelWidth / 2 + 190, -panelHeight / 2 + 200, '金币: —', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#C8F8FF'
+            }).setOrigin(0, 0),
+            achievements: this.add.text(-panelWidth / 2 + 190, -panelHeight / 2 + 230, '成就: —', {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFE8A3',
+                wordWrap: { width: panelWidth - 240 }
+            }).setOrigin(0, 0)
+        };
+
+        Object.values(infoTexts).forEach(text => container.add(text));
+
+        this.uiElements.playerInfo = infoTexts;
+
+        return container;
+    }
+
+    updatePlayerView() {
+        if (!this.uiElements.playerInfo) return;
+        const player = gameState.player || {};
+        const info = this.uiElements.playerInfo;
+
+        info.name.setText(`名称: ${player.name || '—'}`);
+        info.level.setText(`等级: ${player.level || 1}`);
+        info.reputation.setText(`声誉: ${Math.floor(player.reputation || 0)}`);
+        info.gold.setText(`金币: ${GameUtils.formatGold(player.gold || 0)}`);
+
+        const achievements = player.achievements && player.achievements.length
+            ? player.achievements.slice(0, 3).join('、')
+            : '暂无成就';
+        info.achievements.setText(`成就: ${achievements}`);
+    }
+
+    formatMaterialLabel(key) {
+        if (!key) return '未知材料';
+
+        const dictionary = {
+            moonGrass: '月光草',
+            'moon_grass': '月光草',
+            fireGrass: '火焰草',
+            'fire_grass': '火焰草',
+            dewDrop: '晨露滴',
+            'dew_drop': '晨露滴',
+            springWater: '清泉水',
+            'spring_water': '清泉水',
+            dragonScale: '龙鳞',
+            'dragon_scale': '龙鳞',
+            phoenixFeather: '凤凰羽',
+            'phoenix_feather': '凤凰羽',
+            demonBlood: '魔血',
+            'demon_blood': '魔血',
+            unicornHorn: '独角碎片',
+            'unicorn_horn': '独角碎片',
+            timeSand: '时光砂',
+            'time_sand': '时光砂',
+            soulFragment: '灵魂碎片',
+            'soul_fragment': '灵魂碎片',
+            eternalFlower: '永恒花',
+            'eternal_flower': '永恒花',
+            windLeaf: '风之叶',
+            'wind_leaf': '风之叶',
+            earthRoot: '大地根',
+            'earth_root': '大地根',
+            lightShard: '光辉碎片',
+            'light_shard': '光辉碎片',
+            darkEssence: '暗影精华',
+            'dark_essence': '暗影精华',
+            iceCrystal: '寒冰结晶',
+            'ice_crystal': '寒冰结晶',
+            thunderStone: '雷霆石',
+            'thunder_stone': '雷霆石'
+        };
+
+        if (dictionary[key]) return dictionary[key];
+
+        let normalized = key;
+        normalized = normalized.replace(/^material_/, '');
+        normalized = normalized.replace(/_/g, ' ');
+        normalized = normalized.replace(/([A-Z])/g, ' $1');
+        normalized = normalized.trim();
+        return normalized.replace(/\b\w/g, (char) => char.toUpperCase());
     }
 
     /**
@@ -379,23 +1039,33 @@ class TavernScene extends Phaser.Scene {
      */
     createTimeDisplay() {
         const { width } = this.cameras.main;
+        const barWidth = Math.min(width * 0.6, 360);
+        const container = this.add.container(width / 2, this.layout.topBarHeight + 14);
+        container.setDepth(6);
 
-        // 时间进度条
-        const timeBar = this.add.graphics();
-        timeBar.fillStyle(0x2D1B69, 0.8);
-        timeBar.fillRoundedRect(width / 2 - 200, 50, 400, 20, 10);
-        timeBar.lineStyle(2, 0xFFD700, 0.8);
-        timeBar.strokeRoundedRect(width / 2 - 200, 50, 400, 20, 10);
+        const barBg = this.add.image(0, 0, 'ui_progress_bar');
+        barBg.setDisplaySize(barWidth, 18);
+        container.add(barBg);
 
-        // 时间进度
-        this.uiElements.timeProgress = this.add.graphics();
+        const progressFill = this.add.image(-barWidth / 2, 0, 'ui_progress_fill');
+        progressFill.setOrigin(0, 0.5);
+        const fillHeight = 12;
+        progressFill.setDisplaySize(barWidth, fillHeight);
+        container.add(progressFill);
 
-        // 时间文本
-        this.uiElements.timeDisplay = this.add.text(width / 2, 60, '06:00', {
+        const timeText = this.add.text(0, -24, '06:00', {
             fontSize: '16px',
             fontFamily: 'Noto Sans SC',
             color: '#FFF8DC'
         }).setOrigin(0.5);
+        container.add(timeText);
+
+        this.uiElements.timeProgressContainer = container;
+        this.uiElements.timeProgressFill = progressFill;
+        this.uiElements.timeProgressWidth = barWidth;
+        this.uiElements.timeProgressHeight = fillHeight;
+        this.uiElements.timeDisplay = timeText;
+        this.uiElements.timeText = timeText;
     }
 
     /**
@@ -746,35 +1416,29 @@ class TavernScene extends Phaser.Scene {
     createCustomerArea() {
         const { width, height } = this.cameras.main;
 
-        // 客人等待区
-        this.customerArea = this.add.zone(width / 2, height / 2, 600, 200);
-        this.customerArea.setInteractive();
+        const seatCount = 5;
+        const horizontalPadding = Math.min(96, width * 0.1);
+        const usableWidth = Math.max(160, width - horizontalPadding * 2);
+        const baseY = height * 0.55;
 
-        // 客人座位
         this.customerSeats = [];
-        const seatPositions = [
-            { x: 200, y: 300 },
-            { x: 400, y: 350 },
-            { x: 600, y: 300 },
-            { x: 800, y: 350 },
-            { x: 1000, y: 300 }
-        ];
 
-        seatPositions.forEach((pos, index) => {
-            const seat = {
-                id: index,
-                x: pos.x,
-                y: pos.y,
+        for (let i = 0; i < seatCount; i++) {
+            const progress = seatCount === 1 ? 0.5 : i / (seatCount - 1);
+            const x = horizontalPadding + usableWidth * progress;
+            const y = baseY + (i % 2 === 0 ? 0 : 56);
+
+            this.customerSeats.push({
+                id: i,
+                x,
+                y,
                 occupied: false,
                 customer: null
-            };
-            this.customerSeats.push(seat);
-        });
+            });
+        }
 
-        // 客人管理器
-        if (typeof CustomerManager !== 'undefined') {
-            this.customerManager = new CustomerManager();
-            this.customerManager.initialize();
+        if (!this.customerManager && typeof customerManager !== 'undefined') {
+            this.customerManager = customerManager;
         }
     }
 
@@ -1034,18 +1698,11 @@ class TavernScene extends Phaser.Scene {
             this.uiElements.timeDisplay.setText(timeString);
         }
 
-        // 更新时间进度条
-        if (this.uiElements.timeProgress) {
-            this.uiElements.timeProgress.clear();
-            const progress = (this.currentTime / 24) * 400;
-            this.uiElements.timeProgress.fillStyle(0x00FF7F, 0.8);
-            this.uiElements.timeProgress.fillRoundedRect(
-                this.cameras.main.width / 2 - 200,
-                50,
-                progress,
-                20,
-                10
-            );
+        if (this.uiElements.timeProgressFill && this.uiElements.timeProgressWidth) {
+            const progress = Phaser.Math.Clamp(this.currentTime / 24, 0, 1);
+            const width = Math.max(6, this.uiElements.timeProgressWidth * progress);
+            const height = this.uiElements.timeProgressHeight || 12;
+            this.uiElements.timeProgressFill.setDisplaySize(width, height);
         }
     }
 
@@ -1086,6 +1743,11 @@ class TavernScene extends Phaser.Scene {
         if (this.staffManager) {
             this.staffManager.paySalaries();
         }
+
+        this.procurementOffers = this.generateProcurementOffers();
+        this.updateProcurementView();
+        this.updateStrategyView();
+        this.updatePlayerView();
 
         this.queueNotification(`第 ${gameState.time.day} 天开始了！`, 'info');
     }
@@ -1241,51 +1903,75 @@ class TavernScene extends Phaser.Scene {
      * 更新员工显示
      */
     updateStaffDisplay() {
-        // 这里实现员工显示更新逻辑
-        if (!this.staffManager) return;
+        const staffTexts = this.uiElements.staffList || [];
+        const staffInfo = this.staffManager && this.staffManager.getStaffInfo
+            ? this.staffManager.getStaffInfo()
+            : (gameState.staff || []);
 
-        const staffInfo = this.staffManager.getStaffInfo();
-        // 更新员工显示...
+        staffTexts.forEach((text, index) => {
+            if (!text) return;
+            const info = staffInfo[index];
+            if (info) {
+                const status = info.status || info.state || '工作中';
+                const efficiency = info.efficiency ? ` · 效率 ${Math.floor(info.efficiency * 100)}%` : '';
+                text.setText(`${info.name || '员工'} · ${status}${efficiency}`);
+            } else {
+                text.setText('员工空缺');
+            }
+        });
+
+        const activeEvents = (gameState.events && gameState.events.active) || [];
+        if (this.uiElements.eventSummary) {
+            if (activeEvents.length) {
+                const current = activeEvents[0];
+                this.uiElements.eventSummary.setText(`事件: ${current.title || '未知事件'}`);
+            } else {
+                this.uiElements.eventSummary.setText('事件: 当前无随机事件');
+            }
+        }
     }
 
     /**
      * 更新库存显示
      */
     updateInventoryDisplay() {
-        if (!this.potionManager) return;
+        if (!this.potionManager || !this.uiElements.inventoryContent) return;
+
+        const content = this.uiElements.inventoryContent;
+        content.removeAll(true);
 
         const potions = this.potionManager.getAvailablePotions().slice(0, 8);
+        const columns = 4;
+        const slotSpacingX = this.layout.panelWidth / columns;
+        const slotSpacingY = 56;
+        const startX = -this.layout.panelWidth / 2 + slotSpacingX / 2;
 
-        // 清除旧的显示
-        if (this.potionDisplays) {
-            this.potionDisplays.forEach(display => {
-                if (display.sprite) display.sprite.destroy();
-                if (display.text) display.text.destroy();
-            });
-        }
-
-        this.potionDisplays = [];
-
-        // 显示魔药
         potions.forEach((potion, index) => {
-            const x = 350 + (index % 4) * 80;
-            const y = 570 + Math.floor(index / 4) * 40;
+            const col = index % columns;
+            const row = Math.floor(index / columns);
+            const slot = this.add.container(startX + col * slotSpacingX, row * slotSpacingY);
 
-            const potionSprite = this.add.text(x, y, '🔮', {
-                fontSize: '20px'
-            }).setOrigin(0.5);
+            const bg = this.add.image(0, 0, 'ui_button');
+            bg.setDisplaySize(this.layout.actionButtonWidth / 1.6, 42);
+            bg.setAlpha(0.85);
+            slot.add(bg);
 
-            const potionText = this.add.text(x + 20, y, `${potion.name} x${potion.currentCharges}`, {
+            const nameText = this.add.text(-this.layout.actionButtonWidth / 4, -10, potion.name, {
+                fontSize: '14px',
+                fontFamily: 'Noto Sans SC',
+                color: '#FFE8A3'
+            }).setOrigin(0, 0);
+            slot.add(nameText);
+
+            const quantityText = this.add.text(-this.layout.actionButtonWidth / 4, 12,
+                `数量 ${potion.currentCharges || 0}`, {
                 fontSize: '12px',
                 fontFamily: 'Noto Sans SC',
-                color: '#FFF8DC'
+                color: '#C8F8FF'
             }).setOrigin(0, 0.5);
+            slot.add(quantityText);
 
-            this.potionDisplays.push({
-                sprite: potionSprite,
-                text: potionText,
-                potion: potion
-            });
+            content.add(slot);
         });
     }
 
@@ -1300,20 +1986,12 @@ class TavernScene extends Phaser.Scene {
      * 更新UI
      */
     updateUI() {
-        // 更新资源显示
-        if (this.uiElements.goldText) {
-            this.uiElements.goldText.setText(GameUtils.formatGold(gameState.player.gold));
-        }
+        this.updateResourceText('gold', gameState.player.gold);
+        this.updateResourceText('reputation', Math.floor(gameState.player.reputation));
+        this.updateResourceText('materials', this.getTotalMaterials());
 
-        if (this.uiElements.reputationText) {
-            this.uiElements.reputationText.setText(Math.floor(gameState.player.reputation));
-        }
+        const stats = gameState.statistics || {};
 
-        if (this.uiElements.materialsText) {
-            this.uiElements.materialsText.setText(this.getTotalMaterials());
-        }
-
-        // 更新统计
         if (this.uiElements.revenueStat) {
             this.uiElements.revenueStat.setText(`${this.revenueToday} 金币`);
         }
@@ -1322,18 +2000,40 @@ class TavernScene extends Phaser.Scene {
             this.uiElements.customersStat.setText(`${this.customersServedToday} 位`);
         }
 
-        // 更新客人耐心条
+        if (this.uiElements.potionsStat) {
+            const crafted = stats.potionsCraftedToday || stats.totalPotionsCrafted || 0;
+            this.uiElements.potionsStat.setText(`${crafted} 瓶`);
+        }
+
+        if (this.uiElements.efficiencyStat) {
+            const efficiency = stats.staffEfficiency ? Math.floor(stats.staffEfficiency * 100) : 100;
+            this.uiElements.efficiencyStat.setText(`${efficiency}%`);
+        }
+
         this.customerSprites.forEach(display => {
             if (display.patienceBar) {
                 display.patienceBar.update();
             }
         });
 
-        // 更新员工显示
         this.updateStaffDisplay();
-
-        // 更新库存显示
         this.updateInventoryDisplay();
+
+        if (this.activeTab === 'strategy') {
+            this.updateStrategyView();
+        }
+
+        if (this.activeTab === 'procurement') {
+            this.updateProcurementView();
+        }
+
+        if (this.activeTab === 'player') {
+            this.updatePlayerView();
+        }
+
+        if (this.activeTab === 'battle') {
+            this.updateBattleView();
+        }
     }
 
     /**

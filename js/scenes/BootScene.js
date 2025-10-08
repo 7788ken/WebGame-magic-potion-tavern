@@ -192,43 +192,8 @@ class BootScene extends Phaser.Scene {
             assetText.destroy();
         });
 
-        // 加载基础资源
-        this.load.image('logo', 'assets/images/logo.png.svg');
-        this.load.image('background', 'assets/images/background.jpg.svg');
-        this.load.image('tavern_bg', 'assets/images/tavern_background.jpg.svg');
-        this.load.image('cauldron', 'assets/ui/panel.png.svg');
-        this.load.image('potion_base', 'assets/materials/dew_drop.png.svg');
-        this.load.image('card_back', 'assets/sprites/card_back.png.svg');
-
-        // 加载UI资源
-        this.load.image('button_normal', 'assets/ui/button_normal.png.svg');
-        this.load.image('button_hover', 'assets/ui/button_hover.png.svg');
-        this.load.image('button_pressed', 'assets/ui/button_pressed.png.svg');
-        this.load.image('panel', 'assets/ui/panel.png.svg');
-        this.load.image('window', 'assets/ui/window.png.svg');
-
-        // 加载图标资源
-        this.load.image('icon_gold', 'assets/icons/gold.png.svg');
-        this.load.image('icon_reputation', 'assets/icons/reputation.png.svg');
-        this.load.image('icon_materials', 'assets/icons/materials.png.svg');
-        this.load.image('icon_customers', 'assets/icons/inventory.png.svg');
-        this.load.image('icon_staff', 'assets/icons/settings.png.svg');
-
-        // 加载粒子效果资源
-        this.load.image('particle_spark', 'assets/particles/spark.png.svg');
-        this.load.image('particle_glow', 'assets/particles/glow.png.svg');
-        this.load.image('particle_magic', 'assets/particles/magic.png.svg');
-
-        // 加载音频资源
-        this.load.audio('bgm_main', 'assets/audio/bgm/main-bgm.mp3');
-        this.load.audio('bgm_tavern', 'assets/audio/tavern_theme.wav');
-        this.load.audio('bgm_battle', 'assets/audio/battle_theme.wav');
-        this.load.audio('sfx_click', 'assets/audio/click.wav');
-        this.load.audio('sfx_hover', 'assets/audio/hover_sound.mp3');
-        this.load.audio('sfx_success', 'assets/audio/success.wav');
-        this.load.audio('sfx_fail', 'assets/audio/fail.wav');
-        this.load.audio('sfx_potion', 'assets/audio/potion_use.wav');
-        this.load.audio('sfx_card', 'assets/audio/card_draw.wav');
+        AssetManifest.loadByKeys(this, AssetManifest.boot.images || []);
+        AssetManifest.loadByKeys(this, AssetManifest.boot.audio || []);
 
         console.log('📦 BootScene: 基础资源加载完成');
     }

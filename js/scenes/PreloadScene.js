@@ -209,22 +209,24 @@ class PreloadScene extends Phaser.Scene {
     loadGameAssets() {
         console.log('📦 开始加载游戏资源...');
 
-        // 加载图像资源
+        if (typeof AssetManifest === 'undefined' || !AssetManifest.loadAllCategories) {
+            console.warn('AssetManifest 未就绪，回退旧的资源加载方式');
+            this.loadLegacyAssets();
+            return;
+        }
+
+        const visualGroups = ['backgrounds', 'ui', 'icons', 'characters', 'sprites', 'materials'];
+        visualGroups.forEach(group => AssetManifest.loadCategory(this, group));
+        AssetManifest.loadAudioGroup(this);
+        AssetManifest.loadDataGroup(this);
+    }
+
+    loadLegacyAssets() {
         this.loadImages();
-
-        // 加载精灵图
         this.loadSprites();
-
-        // 加载音频资源
         this.loadAudio();
-
-        // 加载数据文件
         this.loadDataFiles();
-
-        // 加载字体
         this.loadFonts();
-
-        // 加载其他资源
         this.loadOtherAssets();
     }
 
@@ -233,10 +235,10 @@ class PreloadScene extends Phaser.Scene {
      */
     loadImages() {
         // 背景图片 - 使用我们创建的SVG占位文件
-        this.load.image('tavern_interior', 'assets/images/background.jpg.svg');
-        this.load.image('brewing_background', 'assets/images/background.jpg.svg');
-        this.load.image('battle_background', 'assets/images/background.jpg.svg');
-        this.load.image('menu_background', 'assets/images/background.jpg.svg');
+        this.load.image('tavern_interior', 'resources/tavern-interior.jpg');
+        this.load.image('brewing_background', 'resources/potions-collection.jpg');
+        this.load.image('battle_background', 'resources/battle-scene.jpg');
+        this.load.image('menu_background', 'resources/hero-tavern.jpg');
 
         // UI元素 - 使用SVG占位文件
         this.load.image('ui_panel', 'assets/ui/button_normal.png.svg');

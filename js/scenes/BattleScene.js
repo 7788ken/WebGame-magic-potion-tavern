@@ -548,9 +548,6 @@ class BattleScene extends Phaser.Scene {
         // 创建卡组
         this.createPlayerDecks();
 
-        // 创建手牌
-        this.initializeHands();
-
         // 设置卡牌交互
         this.setupCardInteractions();
     }
@@ -784,6 +781,9 @@ class BattleScene extends Phaser.Scene {
         this.currentTurn = 1;
         this.currentPlayer = 0;
         this.phase = 'draw';
+
+        // 初始化初始手牌
+        this.initializeHands();
 
         // 开始第一回合
         this.startTurn(0);

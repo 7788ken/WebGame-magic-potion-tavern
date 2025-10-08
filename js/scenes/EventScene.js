@@ -933,7 +933,7 @@ class EventScene extends Phaser.Scene {
 
         if (!this.currentEvent) return;
 
-        const { width } = this.cameras.main;
+        const { width, height } = this.cameras.main;
         const centerX = width / 2;
         const startY = height - 160;
 
